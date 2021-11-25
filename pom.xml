@@ -10,6 +10,7 @@
     <modules>
         <module>commons</module>
         <module>tram</module>
+        <module>triplac</module>
     </modules>
 
     <packaging>pom</packaging>
