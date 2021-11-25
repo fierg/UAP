@@ -1,0 +1,114 @@
+
+// Preliminary Declarations Section ===========================================
+
+package de.unitrier.st.uap;
+
+import java_cup.runtime.Scanner;
+import java_cup.runtime.Symbol;
+import de.unitrier.st.uap.nodes.*;
+
+parser code
+    {:
+
+    /*
+     * Extended error reporting with line and column numbers
+     * provided by the given Symbol object
+     */
+    public void report_error(String message, Object info)
+    {
+        String str = "Error";
+
+        if (info instanceof Symbol)
+        {
+            Symbol symbol = ((Symbol) info);
+
+            if (symbol.left >= 0)
+            {
+                str += " at line " + (symbol.left+1);
+
+                if (symbol.right >= 0)
+                {
+                    str += ", column " + (symbol.right+1);
+                }
+            }
+            
+            str += ", " + symbol.value;
+        }
+
+        str += " : " + message;
+
+        System.err.println(str);
+    }
+
+
+    /*
+     * Extended fatal error reporting with line and column numbers
+     * provided by the given Symbol object
+     */
+    public void report_fatal_error(String message, Object info)
+    {
+        report_error(message, info);
+        System.exit(1);
+    }
+
+    :};
+
+
+// Declaration of Terminals and Non Terminals =================================
+
+terminal Symbol LET;
+// TODO
+// ...
+terminal Integer CONST;
+
+non terminal Node E;
+
+// Grammar Section ===========================================================
+
+/*
+E ::= LET D IN E
+    | ID
+    | ID LPAR A RPAR
+    | E AOP E
+    | LPAR E RPAR
+    | CONST
+    | ID ASSIGN E
+    | E SEMI E
+    | IF B THEN E ELSE E
+    | DO E WHILE B
+    ;
+
+A ::= E
+    | A COMMA E
+    ;
+
+D ::= ID LPAR V RPAR LBRA E RBRA
+    | D D
+    ;
+
+V ::= ID
+    | V COMMA V
+    ;
+
+B ::= E
+    | E RELOP E
+    ;
+*/
+
+start with E;
+
+E ::=  CONST:c {:
+
+        RESULT = new ConstNode(c);
+      :}
+      
+   /*   
+       | LET D:d IN E:e
+      {:
+    
+         
+          RESULT = ??;
+      :}
+   */
+      
+      ;
