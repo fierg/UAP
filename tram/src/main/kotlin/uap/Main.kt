@@ -1,16 +1,18 @@
-import uap.abstractMachine.AbstractMachine
-import uap.filereader.FileReader
+package uap
+
 import kotlinx.cli.ArgParser
 import kotlinx.cli.ArgType
 import kotlinx.cli.default
 import kotlinx.cli.optional
-
 import org.apache.logging.log4j.kotlin.logger
-import uap.Instruction
+import uap.abstractMachine.AbstractMachine
+import uap.filereader.FileReader
 
 internal object Main {
     @JvmStatic
     fun main(argv: Array<String>) {
+
+        println(System.getProperty("user.dir"))
         val logger = logger(Main.javaClass.simpleName)
 
         val cli = handleCLIArguments(argv)
@@ -23,7 +25,7 @@ internal object Main {
         println("\n\n")
 
         println("Running code from file data/program1.tram ...\n")
-        val program1 = FileReader().getInstructions("data/program1.tram")
+        val program1 = FileReader().getInstructions("tram/data/program1.tram")
         AbstractMachine(program1, debug).run()
         println("\n\n")
 
@@ -36,7 +38,7 @@ internal object Main {
 
 
         println("Running ggt from file data/ggt.tram ...\n")
-        val program3 = FileReader().getInstructions("data/ggt.tram")
+        val program3 = FileReader().getInstructions("tram/data/ggt.tram")
         AbstractMachine(program3, debug).run()
         println("\n\n")
 

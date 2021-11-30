@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<LET><DEF><FUNC><ID attr="a"></ID><PARAMS><PARAMS><PARAMS><ID attr="x"></ID><ID attr="y"></ID></PARAMS><ID attr="z"></ID></PARAMS></PARAMS><BODY><READ><ID attr="x"></ID></READ></BODY></FUNC></DEF><BODY><CALL><ID attr="a"></ID><ARGS><ARGS><ARGS><CONST attr="1"></CONST></ARGS><CONST attr="2"></CONST></ARGS><CONST attr="3"></CONST></ARGS></CALL></BODY></LET>

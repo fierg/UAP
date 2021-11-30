@@ -1,6 +1,6 @@
 package uap.abstractMachine
 
-import Main
+import uap.Main
 import org.apache.logging.log4j.kotlin.logger
 import uap.Instruction
 import uap.stack.LinkedListStack

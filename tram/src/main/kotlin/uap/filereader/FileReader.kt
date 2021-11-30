@@ -19,24 +19,10 @@ class FileReader {
                 when (groups.size) {
                     3 -> instructions.add(Instruction(getOptCodeFromString(groups[2])))
                     4 -> instructions.add(Instruction(getOptCodeFromString(groups[2]), groups[3].toInt()))
-                    5 -> instructions.add(
-                        Instruction(
-                            getOptCodeFromString(groups[2]),
-                            groups[3].toInt(),
-                            groups[4].toInt()
-                        )
-                    )
-                    6 -> instructions.add(
-                        Instruction(
-                            getOptCodeFromString(groups[2]),
-                            groups[3].toInt(),
-                            groups[4].toInt(),
-                            groups[5].toInt()
-                        )
-                    )
+                    5 -> instructions.add(Instruction(getOptCodeFromString(groups[2]), groups[3].toInt(), groups[4].toInt()))
+                    6 -> instructions.add(Instruction(getOptCodeFromString(groups[2]), groups[3].toInt(), groups[4].toInt(), groups[5].toInt()))
                     else -> throw UnexpectedInstructionException("unexpected instruction size: ${groups.size}")
                 }
-
             } else {
                 throw UnexpectedInstructionException("unexpected input for line: $line")
             }
