@@ -1,8 +1,6 @@
 
 // Usercode Section ===========================================================
 
-package de.unitrier.st.uap;
-
 import java_cup.runtime.Symbol;
 
 %%
@@ -52,8 +50,8 @@ import java_cup.runtime.Symbol;
 LineTerminator  = \r | \n | \r\n
 WhiteSpace      = {LineTerminator} | [ \t\f]
 PositiveInteger = 0 | [1-9][0-9]*
-
-Identifier = /* TODO */ .*
+ /* TODO */
+Identifier = [:jletter:] [:jletterdigit:]*
 
 /* Comments */
 TraditionalComment = "/*" [^*] ~"*/" | "/*" "*"+ "/"
@@ -74,13 +72,14 @@ Comment = {TraditionalComment} | {EndOfLineComment} |
 	"let"   { return createSymbol(sym.LET); }
 
     // TODO 
-    // ... 
+    // ...
+
 
 	// Positive integers
     {PositiveInteger} { return createSymbol( sym.CONST, new Integer(yytext()) ); }
 
     // Identifiers
-    //{Identifier} { return createSymbol( sym.ID, yytext() ); }
+    {Identifier} { return createSymbol( sym.ID, yytext() ); }
 
     // White space
     {WhiteSpace} { /* do nothing */ }

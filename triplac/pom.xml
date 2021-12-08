@@ -86,8 +86,8 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <className>MyParserClassName</className>
-                    <symbolsName>MySymbolsClassName</symbolsName>
+                    <className>Parser</className>
+                    <symbolsName>Symbols</symbolsName>
                     <cupDefinition>src/main/cup/tripla.cup</cupDefinition>
                 </configuration>
             </plugin>

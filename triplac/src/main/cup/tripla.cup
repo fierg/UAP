@@ -59,6 +59,10 @@ parser code
 terminal Symbol LET;
 // TODO
 // ...
+
+terminal Symbol TRUE;
+terminal Symbol FALSE;
+
 terminal Integer CONST;
 
 non terminal Node E;
@@ -90,8 +94,17 @@ V ::= ID
     | V COMMA V
     ;
 
-B ::= E
+B ::= LOP
     | E RELOP E
+    ;
+
+LOP ::= TRUE
+    | FLASE
+    | ( LOP )
+    | LOP || LOP
+    | LOP && LOP
+    | LOP == LOP
+    | LOP != LOP
     ;
 */
 
