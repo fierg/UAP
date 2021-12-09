@@ -1,8 +1,6 @@
 package uap
 
-import uap.lexer.Lexer
 import uap.node.Node
-import uap.parser.Parser
 import java.io.BufferedWriter
 import java.io.FileReader
 import java.io.FileWriter

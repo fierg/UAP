@@ -68,11 +68,34 @@ Comment = {TraditionalComment} | {EndOfLineComment} |
 /* Lexical Rules */
 <YYINITIAL> {
 
-    // Keyword tokens
 	"let"   { return createSymbol(sym.LET); }
-
-    // TODO 
-    // ...
+    "in"	{return sf.newSymbol("IN", sym.IN);}
+    "if"	{return sf.newSymbol("IF", sym.IF);}
+    "else"	{return sf.newSymbol("ELSE", sym.ELSE);}
+    "while" {return sf.newSymbol("WHILE", sym.WHILE);}
+    "then"	{return sf.newSymbol("THEN", sym.THEN);}
+    "do"    {return sf.newSymbol("DO", sym.DO);}
+    "false" {return sf.newSymbol("FBOOL",sym.BOOL,false);}
+    "true"  {return sf.newSymbol("TBOOL", sym.BOOL,true);}
+    "="		{return sf.newSymbol("ASSIGN", sym.ASSIGN);}
+    "("		{return sf.newSymbol("LPAR", sym.LPAR);}
+    ")"		{return sf.newSymbol("RPAR", sym.RPAR);}
+    "{"		{return sf.newSymbol("LBRA", sym.LBRA);}
+    "}"		{return sf.newSymbol("RBRA", sym.RBRA);}
+    ","		{return sf.newSymbol("COMMA", sym.COMMA);}
+    ";"		{return sf.newSymbol("SMICOLON", sym.SEMICOLON);}
+    "+"		{return sf.newSymbol("ADD", sym.ADD);}
+    "-"		{return sf.newSymbol("SUB", sym.SUB);}
+    "*"		{return sf.newSymbol("MUL", sym.MUL);}
+    "/"		{return sf.newSymbol("DIV", sym.DIV);}
+    "=="	{return sf.newSymbol("EQ", sym.EQ);}
+    "!="	{return sf.newSymbol("NEQ", sym.NEQ);}
+    "<"		{return sf.newSymbol("LT", sym.LT);}
+    ">"		{return sf.newSymbol("GT", sym.GT);}
+    "=<"	{return sf.newSymbol("LTE", sym.LTE);}
+    "=>"	{return sf.newSymbol("GTE", sym.GTE);}
+    "||"    {return sf.newSymbol("OR", sym.OR);}
+    "&&"    {return sf.newSymbol("AND", sym.AND);}
 
 
 	// Positive integers

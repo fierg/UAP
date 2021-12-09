@@ -57,17 +57,30 @@ parser code
 // Declaration of Terminals and Non Terminals =================================
 
 terminal Symbol LET;
-// TODO
-// ...
-
+terminal Symbol IN;
+terminal Symbol IF, THEN, ELSE;
+terminal Symbol DO, WHILE;
+terminal Symbol LPAR, RPAR, LBRA, RBRA, COMMA, SEMICOLON;
+terminal Symbol ADD, SUB, MUL, DIV;
+terminal Symbol EQ, NEQ, GT, LT, GTE, LTE;
+terminal Symbol AND, OR;
+terminal Symbol ASSIGN;
+terminal String ID;
+terminal Boolean BOOL;
 terminal Symbol TRUE;
 terminal Symbol FALSE;
-
 terminal Integer CONST;
+non terminal Node E, A, D, V, B;
 
-non terminal Node E;
 
 // Grammar Section ===========================================================
+precedence left ASSIGN;
+precedence left AND;
+precedence left OR;
+precedence left EQ, NEQ, LT, GT, GTE, LTE;
+precedence left ADD, SUB;
+precedence left MUL, DIV;
+
 
 /*
 E ::= LET D IN E
@@ -110,18 +123,107 @@ LOP ::= TRUE
 
 start with E;
 
-E ::=  CONST:c {:
 
-        RESULT = new ConstNode(c);
-      :}
-      
-   /*   
-       | LET D:d IN E:e
-      {:
-    
-         
-          RESULT = ??;
-      :}
-   */
-      
-      ;
+E ::=   LET D:d IN E:e
+		{:RESULT = new LetNode(new DefNode(d),new BodyNode(e));:}
+		|
+		ID:i
+		{:RESULT = new ReadNode(new IdNode(i));:}
+		|
+		ID:i LPAR A:a RPAR
+		{:RESULT = new FuncNode(new IdNode(i), new ArgNode(a));:}
+		|
+		E:e1 MUL E:e2
+		{:RESULT = new MulNode(e1, e2);:}
+		|
+		E:e1 DIV E:e2
+		{:RESULT = new DivNode(e1, e2);:}
+		|
+		E:e1 ADD E:e2
+		{:RESULT = new AddNode(e1, e2);:}
+		|
+		E:e1 SUB E:e2
+		{:RESULT = new SubNode(e1, e2);:}
+		|
+		LPAR E:e RPAR
+		{:RESULT = new ParNode(e);:}
+		|
+		CONST:c
+		{:RESULT = new ConstNode(c);:}
+		|
+		ID:i ASSIGN E:e
+		{:RESULT = new AssignNode(new IdNode(i), e);:}
+		|
+		E:e1 SEMICOLON E:e2
+		{:RESULT = new SemicolonNode(e1, e2);:}
+		|
+		IF B:b THEN E:e1 ELSE E:e2
+		{:RESULT = new IfNode(new ConditionNode(b), new ThenNode(e1), new ElseNode(e2));:}
+		|
+        WHILE B:b DO E:e
+        {:RESULT = new WhileNode(new ConditionNode(b), new DoNode(e));:}
+        |
+        LBRA E:e RBRA
+        {:RESULT = e;:}
+	;
+
+A ::=
+		E:e
+		{:RESULT = e;:}
+		|
+		A:a COMMA E:e
+		{:RESULT = new CommaNode(a, e);:}
+	;
+
+D ::=
+		ID:i LPAR V:v RPAR LBRA E:e RBRA
+		{:RESULT = new FuncDefNode(new IdNode(i), new ParamNode(v), new BodyNode(e));:}
+		|
+		D:d1 D:d2
+		{:RESULT = new SequenceNode(d1, d2);:}
+	;
+
+V ::=
+		ID:i
+		{:RESULT = new IdNode(i);:}
+		|
+		V:v1 COMMA V:v2
+		{:RESULT = new CommaNode(v1, v2);:}
+	;
+
+B ::=   BOOL:b
+        {:RESULT = new BoolNode(b);:}
+        |
+        E:e1 GT E:e2
+        {:RESULT =  new EqNode(e1,e2);:}
+        |
+        E:e1 LT E:e2
+        {:RESULT =  new EqNode(e1,e2);:}
+        |
+        E:e1 GTE E:e2
+        {:RESULT =  new EqNode(e1,e2);:}
+        |
+        E:e1 LTE E:e2
+        {:RESULT =  new EqNode(e1,e2);:}
+        |
+        E:e1 EQ E:e2
+        {:RESULT = new EqNode(e1,e2);:}
+        |
+        E:e1 NEQ E:e2
+        {:RESULT = new NeqNode(e1,e2);:}
+        |
+        B:b1 EQ B:b2
+        {:RESULT = new EqNode(b1,b2);:}
+        |
+        B:b1 NEQ B:b2
+        {:RESULT = new NeqNode(b1,b2);:}
+        |
+        B:b1 AND B:b2
+        {:RESULT = new AndNode(b1,b2);:}
+        |
+        B:b1 OR B:b2
+        {:RESULT = new OrNode(b1,b2);:}
+        |
+        LPAR B:b RPAR
+        {:RESULT = b;:}
+	;
