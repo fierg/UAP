@@ -69,33 +69,33 @@ Comment = {TraditionalComment} | {EndOfLineComment} |
 <YYINITIAL> {
 
 	"let"   { return createSymbol(sym.LET); }
-    "in"	{return sf.newSymbol("IN", sym.IN);}
-    "if"	{return sf.newSymbol("IF", sym.IF);}
-    "else"	{return sf.newSymbol("ELSE", sym.ELSE);}
-    "while" {return sf.newSymbol("WHILE", sym.WHILE);}
-    "then"	{return sf.newSymbol("THEN", sym.THEN);}
-    "do"    {return sf.newSymbol("DO", sym.DO);}
-    "false" {return sf.newSymbol("FBOOL",sym.BOOL,false);}
-    "true"  {return sf.newSymbol("TBOOL", sym.BOOL,true);}
-    "="		{return sf.newSymbol("ASSIGN", sym.ASSIGN);}
-    "("		{return sf.newSymbol("LPAR", sym.LPAR);}
-    ")"		{return sf.newSymbol("RPAR", sym.RPAR);}
-    "{"		{return sf.newSymbol("LBRA", sym.LBRA);}
-    "}"		{return sf.newSymbol("RBRA", sym.RBRA);}
-    ","		{return sf.newSymbol("COMMA", sym.COMMA);}
-    ";"		{return sf.newSymbol("SMICOLON", sym.SEMICOLON);}
-    "+"		{return sf.newSymbol("ADD", sym.ADD);}
-    "-"		{return sf.newSymbol("SUB", sym.SUB);}
-    "*"		{return sf.newSymbol("MUL", sym.MUL);}
-    "/"		{return sf.newSymbol("DIV", sym.DIV);}
-    "=="	{return sf.newSymbol("EQ", sym.EQ);}
-    "!="	{return sf.newSymbol("NEQ", sym.NEQ);}
-    "<"		{return sf.newSymbol("LT", sym.LT);}
-    ">"		{return sf.newSymbol("GT", sym.GT);}
-    "=<"	{return sf.newSymbol("LTE", sym.LTE);}
-    "=>"	{return sf.newSymbol("GTE", sym.GTE);}
-    "||"    {return sf.newSymbol("OR", sym.OR);}
-    "&&"    {return sf.newSymbol("AND", sym.AND);}
+    "in"	{return createSymbol( sym.IN);}
+    "if"	{return createSymbol( sym.IF);}
+    "else"	{return createSymbol( sym.ELSE);}
+    "while" {return createSymbol( sym.WHILE);}
+    "then"	{return createSymbol( sym.THEN);}
+    "do"    {return createSymbol( sym.DO);}
+    "false" {return createSymbol(sym.BOOL,false);}
+    "true"  {return createSymbol( sym.BOOL,true);}
+    "="		{return createSymbol( sym.ASSIGN);}
+    "("		{return createSymbol( sym.LPAR);}
+    ")"		{return createSymbol( sym.RPAR);}
+    "{"		{return createSymbol( sym.LBRA);}
+    "}"		{return createSymbol( sym.RBRA);}
+    ","		{return createSymbol( sym.COMMA);}
+    ";"		{return createSymbol( sym.SEMICOLON);}
+    "+"		{return createSymbol( sym.ADD);}
+    "-"		{return createSymbol( sym.SUB);}
+    "*"		{return createSymbol( sym.MUL);}
+    "/"		{return createSymbol( sym.DIV);}
+    "=="	{return createSymbol( sym.EQ);}
+    "!="	{return createSymbol( sym.NEQ);}
+    "<"		{return createSymbol( sym.LT);}
+    ">"		{return createSymbol( sym.GT);}
+    "=<"	{return createSymbol( sym.LTE);}
+    "=>"	{return createSymbol( sym.GTE);}
+    "||"    {return createSymbol( sym.OR);}
+    "&&"    {return createSymbol( sym.AND);}
 
 
 	// Positive integers
