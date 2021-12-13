@@ -74,6 +74,7 @@ non terminal Node E, A, D, V, B;
 
 
 // Grammar Section ===========================================================
+precedence left COMMA, SEMICOLON, ID;
 precedence left ASSIGN;
 precedence left AND;
 precedence left OR;
