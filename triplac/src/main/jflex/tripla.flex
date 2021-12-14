@@ -1,6 +1,8 @@
 
 // Usercode Section ===========================================================
 
+package de.unitrier.st.uap;
+
 import java_cup.runtime.Symbol;
 
 %%
@@ -50,8 +52,7 @@ import java_cup.runtime.Symbol;
 LineTerminator  = \r | \n | \r\n
 WhiteSpace      = {LineTerminator} | [ \t\f]
 PositiveInteger = 0 | [1-9][0-9]*
- /* TODO */
-Identifier = [:jletter:] [:jletterdigit:]*
+Identifier      = [A-Za-z_][A-Za-z_0-9]*
 
 /* Comments */
 TraditionalComment = "/*" [^*] ~"*/" | "/*" "*"+ "/"
@@ -68,35 +69,43 @@ Comment = {TraditionalComment} | {EndOfLineComment} |
 /* Lexical Rules */
 <YYINITIAL> {
 
+    // Keyword tokens
 	"let"   { return createSymbol(sym.LET); }
-    "in"	{return createSymbol( sym.IN);}
-    "if"	{return createSymbol( sym.IF);}
-    "else"	{return createSymbol( sym.ELSE);}
-    "while" {return createSymbol( sym.WHILE);}
-    "then"	{return createSymbol( sym.THEN);}
-    "do"    {return createSymbol( sym.DO);}
-    "false" {return createSymbol(sym.BOOL,false);}
-    "true"  {return createSymbol( sym.BOOL,true);}
-    "="		{return createSymbol( sym.ASSIGN);}
-    "("		{return createSymbol( sym.LPAR);}
-    ")"		{return createSymbol( sym.RPAR);}
-    "{"		{return createSymbol( sym.LBRA);}
-    "}"		{return createSymbol( sym.RBRA);}
-    ","		{return createSymbol( sym.COMMA);}
-    ";"		{return createSymbol( sym.SEMICOLON);}
-    "+"		{return createSymbol( sym.ADD);}
-    "-"		{return createSymbol( sym.SUB);}
-    "*"		{return createSymbol( sym.MUL);}
-    "/"		{return createSymbol( sym.DIV);}
-    "=="	{return createSymbol( sym.EQ);}
-    "!="	{return createSymbol( sym.NEQ);}
-    "<"		{return createSymbol( sym.LT);}
-    ">"		{return createSymbol( sym.GT);}
-    "=<"	{return createSymbol( sym.LTE);}
-    "=>"	{return createSymbol( sym.GTE);}
-    "||"    {return createSymbol( sym.OR);}
-    "&&"    {return createSymbol( sym.AND);}
+	"in"    { return createSymbol(sym.IN); }
+    "if"    { return createSymbol(sym.IF); }
+    "then"  { return createSymbol(sym.THEN); }
+    "else"  { return createSymbol(sym.ELSE); }
+    "do"    { return createSymbol(sym.DO); }
+    "while" { return createSymbol(sym.WHILE); }
 
+    // Parentheses tokens
+    "(" { return createSymbol(sym.LPAR); }
+    ")" { return createSymbol(sym.RPAR); }
+    "{" { return createSymbol(sym.LBRA); }
+    "}" { return createSymbol(sym.RBRA); }
+
+    // Assign token
+    "="  { return createSymbol(sym.ASSIGN); }
+
+    // Arithmetic operator tokens
+    "+"  { return createSymbol(sym.ADD); }
+    "-"  { return createSymbol(sym.SUB); }
+    "*"  { return createSymbol(sym.MULT); }
+    "/"  { return createSymbol(sym.DIV); }
+
+    // Comparison operator tokens
+    "==" { return createSymbol(sym.EQ); }
+    "!=" { return createSymbol(sym.NEQ); }
+    ">"  { return createSymbol(sym.GT); }
+    "<"  { return createSymbol(sym.LT); }
+
+    // Logical operator tokens
+     "&&"  { return createSymbol(sym.AND); }
+     "||"  { return createSymbol(sym.OR); }
+
+    // Semicolon/comma tokens
+	";" { return createSymbol(sym.SEMI); }
+	"," { return createSymbol(sym.COMMA); }
 
 	// Positive integers
     {PositiveInteger} { return createSymbol( sym.CONST, new Integer(yytext()) ); }
