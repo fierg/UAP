@@ -1,5 +1,7 @@
-package uap
+package uap;
 
+import de.unitrier.st.uap.*
+import uap.node.Node
 import java.io.BufferedWriter
 import java.io.FileReader
 import java.io.FileWriter
@@ -16,7 +18,7 @@ internal object Main {
         val ast: Node
         try {
             var fileName = args[0]
-            val triplaParser = Parser(Lexer(FileReader(fileName)))
+            val triplaParser = Parser(de.unitrier.st.uap.Lexer(FileReader(fileName)))
             ast = triplaParser.parse().value as Node
             fileName = fileName.substring(fileName.lastIndexOf("/") + 1, fileName.lastIndexOf("."))
             fileName = String.format("%s-ast.xml", fileName)

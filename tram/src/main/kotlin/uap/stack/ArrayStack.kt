@@ -14,6 +14,4 @@ class ArrayStack : IStack<Int> {
     override fun pop(): Int {
         TODO("Not yet implemented")
     }
-
-
 }

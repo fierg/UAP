@@ -87,8 +87,10 @@
                 </executions>
                 <configuration>
                     <className>Parser</className>
-                    <symbolsName>Symbols</symbolsName>
+                    <symbolsName>sym</symbolsName>
                     <cupDefinition>src/main/cup/tripla.cup</cupDefinition>
+                    <outputDirectory>${project.build.directory}/generated-sources/cup</outputDirectory>
+                    <packageName>de.unitrier.st.uap</packageName>
                 </configuration>
             </plugin>
 
@@ -103,6 +105,11 @@
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <outputDirectory>${project.build.directory}/generated-sources/jflex</outputDirectory>
+                    <minimize>true</minimize>
+                    <verbose>true</verbose>
+                </configuration>
             </plugin>
         </plugins>
     </build>

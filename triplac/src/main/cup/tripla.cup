@@ -5,7 +5,7 @@ package de.unitrier.st.uap;
 
 import java_cup.runtime.Scanner;
 import java_cup.runtime.Symbol;
-import de.unitrier.st.uap.nodes.*;
+import uap.node.*;
 
 parser code
     {:

@@ -4,7 +4,7 @@ class LinkedListStack : IStack<Int> {
 
     private val stack = mutableListOf<Int>()
 
-    override operator fun get(index: Int): Int {
+     override operator fun get(index: Int): Int {
         return if (index < stack.size) {
             stack[index]
         } else {

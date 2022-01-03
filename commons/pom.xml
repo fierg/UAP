@@ -38,11 +38,6 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>uap</groupId>
-            <artifactId>commons</artifactId>
-            <version>0.0.1</version>
-        </dependency>
     </dependencies>
 
     <build>
