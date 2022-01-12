@@ -12,11 +12,6 @@ class TramCodeGenerator(private val ast: Node) {
 
     fun generate(): List<Instruction> {
         val rho = ast.elab_def(mutableMapOf<String, AddressPair>(), 0)
-
-        val instructions = mutableListOf<Instruction>()
-
-
-
-        return instructions
+        return ast.code(rho, 0)
     }
 }

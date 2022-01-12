@@ -25,20 +25,18 @@ public class Flattener implements IFlattener {
         }
     }
 
-    protected void proceed(Node node){
-        for (Node n:node.getChildren()) {
-            n.accept(this);
-        }
-    }
-
     @Override
     public void visit(Node node) {
         //If node is of specified type, flatten() will be called
         if (node instanceof DefNode || node instanceof ArgsNode || node instanceof ParamsNode || node instanceof SemiNode) {
             flatten(node);
-            proceed(node);
+            for (Node n:node.getChildren()) {
+                n.accept(this);
+            }
         } else
-            proceed(node);
+            for (Node n:node.getChildren()) {
+                n.accept(this);
+            }
     }
 
 }

@@ -2,6 +2,6 @@ package uap.node.interfaces;
 
 import uap.flattener.IFlattener;
 
-public interface IAcceptor {
+public interface IVisitorAcceptor {
     void accept(IFlattener v);
 }

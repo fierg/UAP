@@ -1,7 +1,6 @@
 
 package uap.node;
 
-import uap.node.address.AddressFactory;
 import uap.node.address.AddressPair;
 
 import java.util.HashMap;
@@ -21,7 +20,7 @@ public class FuncNode extends Node {
 
         Map<String, AddressPair> rhoC = new HashMap(rho);
         AtomicReference<String> functionName = new AtomicReference<>("");
-        List<String> params = new LinkedList<String>();
+        List<String> params = new LinkedList();
 
         getChildren().forEach(node -> {
             if (IDNode.class.equals(node.getClass())) {
