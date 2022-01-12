@@ -1,4 +1,4 @@
-package uap.stack
+package uap.tram.stack
 
 class ArrayStack : IStack<Int> {
 
