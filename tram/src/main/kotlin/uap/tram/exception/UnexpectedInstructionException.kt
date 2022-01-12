@@ -1,4 +1,4 @@
-package uap.exception
+package uap.tram.exception
 
 class UnexpectedInstructionException(s: String) : Exception(s) {
 }

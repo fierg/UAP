@@ -1,4 +1,4 @@
-package uap.stack
+package uap.tram.stack
 
 interface IStack<T> {
 

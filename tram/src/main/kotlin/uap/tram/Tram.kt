@@ -1,19 +1,19 @@
-package uap
+package uap.tram
 
 import kotlinx.cli.ArgParser
 import kotlinx.cli.ArgType
 import kotlinx.cli.default
 import kotlinx.cli.optional
 import org.apache.logging.log4j.kotlin.logger
-import uap.abstractMachine.AbstractMachine
-import uap.filereader.FileReader
+import uap.Instruction
+import uap.tram.abstractMachine.AbstractMachine
+import uap.tram.filereader.FileReader
 
-internal object Main {
-    @JvmStatic
+internal object Tram {
     fun main(argv: Array<String>) {
 
         println(System.getProperty("user.dir"))
-        val logger = logger(Main.javaClass.simpleName)
+        val logger = logger(Tram.javaClass.simpleName)
 
         val cli = handleCLIArguments(argv)
         val debug = cli.first

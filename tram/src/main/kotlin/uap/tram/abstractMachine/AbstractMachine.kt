@@ -1,13 +1,12 @@
-package uap.abstractMachine
+package uap.tram.abstractMachine
 
-import uap.Main
 import org.apache.logging.log4j.kotlin.logger
 import uap.Instruction
-import uap.stack.LinkedListStack
+import uap.tram.stack.LinkedListStack
 import java.rmi.UnexpectedException
 
 class AbstractMachine(private val program: Array<Instruction>, private val debug: Boolean) {
-    private val logger = logger(Main.javaClass.simpleName)
+    private val logger = logger("AbstractMachine")
 
     private val stack = LinkedListStack()
     private var top = 0

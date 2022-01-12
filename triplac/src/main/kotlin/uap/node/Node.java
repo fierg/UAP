@@ -1,8 +1,10 @@
 package uap.node;
 
+import uap.flattener.IFlattener;
+
 import java.util.LinkedList;
 
-public abstract class Node
+public abstract class Node implements IAcceptor
 {
     private String type;
     private Object attribute;
@@ -91,5 +93,10 @@ public abstract class Node
         }
         str.append(endTag());
         return str.toString();
+    }
+
+    @Override
+    public void accept(IFlattener v){
+        v.visit(this);
     }
 }

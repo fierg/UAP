@@ -1,7 +1,7 @@
-package uap.filereader
+package uap.tram.filereader
 
 import uap.Instruction
-import uap.exception.UnexpectedInstructionException
+import uap.tram.exception.UnexpectedInstructionException
 import java.io.File
 
 class FileReader {
