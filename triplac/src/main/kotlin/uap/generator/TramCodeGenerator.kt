@@ -11,4 +11,8 @@ class TramCodeGenerator(ast: Node) {
         return instructions
     }
 
+    fun elabDef() {
+
+    }
+
 }

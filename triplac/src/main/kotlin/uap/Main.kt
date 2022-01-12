@@ -25,7 +25,9 @@ internal object Main {
         printAST(fileName, ast)
 
         val f = Flattener()
-        f.visit(ast)
+        ast.accept(f)
+
+        printAST(fileName,ast)
 
         val t = TramCodeGenerator(ast)
         val output = t.generate()
