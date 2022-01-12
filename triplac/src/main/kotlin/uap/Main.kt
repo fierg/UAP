@@ -24,9 +24,9 @@ internal object Main {
 
         printAST(fileName, ast)
 
-        //AST Strukturverbesserung via visitor pattern
-        //val f = Flattener()
-        //ast.accept(f)
+        //AST Strukturverbesserung
+        val f = Flattener()
+        f.flatten(ast)
 
         printAST(fileName,ast)
 

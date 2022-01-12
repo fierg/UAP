@@ -1,11 +1,9 @@
 package uap.node;
 
 import uap.Instruction;
-import uap.flattener.IFlattener;
 import uap.node.address.AddressFactory;
 import uap.node.address.AddressPair;
 import uap.node.interfaces.ITramcodeGeneratable;
-import uap.node.interfaces.IVisitorAcceptor;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -13,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
-public abstract class Node implements IVisitorAcceptor, ITramcodeGeneratable {
+public abstract class Node implements  ITramcodeGeneratable {
     private String type;
     private Object attribute;
     private LinkedList<Node> children;
@@ -87,11 +85,6 @@ public abstract class Node implements IVisitorAcceptor, ITramcodeGeneratable {
         }
         str.append(endTag());
         return str.toString();
-    }
-
-    @Override
-    public void accept(IFlattener v) {
-        v.visit(this);
     }
 
     public Map<String, AddressPair> elab_def(Map<String, AddressPair> rho, int nl) {

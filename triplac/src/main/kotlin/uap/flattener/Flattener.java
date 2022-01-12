@@ -4,9 +4,9 @@ import uap.node.*;
 
 import java.util.ListIterator;
 
-public class Flattener implements IFlattener {
+public class Flattener {
 
-    private void flatten(Node node){
+    private void applyFlatten(Node node){
         boolean flattened = true;
         while(flattened){
             flattened = false;
@@ -25,17 +25,16 @@ public class Flattener implements IFlattener {
         }
     }
 
-    @Override
-    public void visit(Node node) {
+    public void flatten(Node node) {
         //If node is of specified type, flatten() will be called
         if (node instanceof DefNode || node instanceof ArgsNode || node instanceof ParamsNode || node instanceof SemiNode) {
-            flatten(node);
+            applyFlatten(node);
             for (Node n:node.getChildren()) {
-                n.accept(this);
+                flatten(n);
             }
         } else
             for (Node n:node.getChildren()) {
-                n.accept(this);
+                flatten(n);
             }
     }
 
