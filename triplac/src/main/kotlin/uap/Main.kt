@@ -24,17 +24,14 @@ internal object Main {
 
         printAST(fileName, ast)
 
-        val f = Flattener()
-        ast.accept(f)
+        //AST Strukturverbesserung via visitor pattern
+        //val f = Flattener()
+        //ast.accept(f)
 
         printAST(fileName,ast)
 
         val t = TramCodeGenerator(ast)
         val output = t.generate()
-
-        for (i in output) {
-            println(i.toString())
-        }
 
         val abstractMachine = AbstractMachine(output.toTypedArray(),true)
         abstractMachine.run()

@@ -6,9 +6,4 @@ public class WhileNode extends Node
     {
         super("WHILE");
     }
-
-    @Override
-    public void setType(String type) {
-        super.setType(type);
-    }
 }

@@ -2,21 +2,15 @@
 package uap.node;
 
 import uap.Instruction;
-import uap.generator.adress.AddressPair;
-import uap.node.interfaces.ITramcodeGeneratable;
+import uap.node.address.AddressPair;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class ConstNode extends Node implements ITramcodeGeneratable {
+public class ConstNode extends Node {
     public ConstNode(Integer value) {
         super("CONST", value);
-    }
-
-    @Override
-    public Map<String, AddressPair> elab_def(Map<String, AddressPair> rho, int nl) {
-        return null;
     }
 
     @Override

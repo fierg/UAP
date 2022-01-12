@@ -1,6 +1,5 @@
 package uap.flattener;
 
-
 import uap.node.*;
 
 import java.util.ListIterator;
@@ -11,12 +10,14 @@ public class Flattener implements IFlattener {
         boolean flattened = true;
         while(flattened){
             flattened = false;
-            for (final ListIterator<Node> i = node.getChildren().listIterator(); i.hasNext();) {
-                final Node n = i.next();
-                if (node.getType().equals(n.getType())) {
-                    i.remove();
-                    for (Node m:n.getChildren()) {
-                        i.add(m);
+            for (final ListIterator<Node> nodeIterator = node.getChildren().listIterator(); nodeIterator.hasNext();) {
+                final Node currentChildren = nodeIterator.next();
+
+                //If the children of current node are of the same type as the node, they will be removed and added as children of the current node
+                if (node.getType().equals(currentChildren.getType())) {
+                    nodeIterator.remove();
+                    for (Node childrenOfRemovedNode:currentChildren.getChildren()) {
+                        nodeIterator.add(childrenOfRemovedNode);
                     }
                     flattened = true;
                 }
@@ -24,7 +25,7 @@ public class Flattener implements IFlattener {
         }
     }
 
-    protected void permute(Node node){
+    protected void proceed(Node node){
         for (Node n:node.getChildren()) {
             n.accept(this);
         }
@@ -32,11 +33,12 @@ public class Flattener implements IFlattener {
 
     @Override
     public void visit(Node node) {
-        if (node instanceof ArgsNode || node instanceof DefNode || node instanceof ParamsNode || node instanceof SemiNode) {
+        //If node is of specified type, flatten() will be called
+        if (node instanceof DefNode || node instanceof ArgsNode || node instanceof ParamsNode || node instanceof SemiNode) {
             flatten(node);
-            permute(node);
+            proceed(node);
         } else
-            permute(node);
+            proceed(node);
     }
 
 }

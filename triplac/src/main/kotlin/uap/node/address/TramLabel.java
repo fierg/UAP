@@ -1,14 +1,9 @@
 package uap.node.address;
 
-import uap.Instruction;
-
 public class TramLabel {
-    public final Instruction from;
-    public Instruction to;
-    public TramLabel(Instruction instruction) {
-        from = instruction;
+    TramLabel(int address) {
+        this.address = address;
     }
-    public void setToLabel(Instruction instruction){
-        to = instruction;
-    }
+
+    int address;
 }

@@ -2,13 +2,12 @@
 package uap.node;
 
 import uap.Instruction;
-import uap.generator.adress.AddressPair;
-import uap.node.interfaces.ITramcodeGeneratable;
+import uap.node.address.AddressPair;
 
 import java.util.List;
 import java.util.Map;
 
-public class AssignNode extends Node implements ITramcodeGeneratable
+public class AssignNode extends Node
 {
     public AssignNode()
     {
@@ -17,7 +16,15 @@ public class AssignNode extends Node implements ITramcodeGeneratable
 
     @Override
     public Map<String, AddressPair> elab_def(Map<String, AddressPair> rho, int nl) {
-        return null;
+        System.out.println("Handling assign node on level " + nl);
+
+        getChildren().forEach(node -> {
+            if (IDNode.class.equals(node.getClass())){
+                rho.put((String) node.getAttribute(), addressFactory.getNewIntegerAddressPair(nl));
+            } else
+                node.elab_def(rho,nl);
+        });
+        return rho;
     }
 
     @Override
