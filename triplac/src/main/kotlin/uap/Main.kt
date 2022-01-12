@@ -1,8 +1,8 @@
 package uap;
 
 import de.unitrier.st.uap.*
-import uap.tram.abstractMachine.AbstractMachine
 import uap.flattener.Flattener
+import uap.tram.abstractMachine.AbstractMachine
 import uap.generator.TramCodeGenerator
 import uap.node.Node
 import java.io.BufferedWriter

@@ -1,6 +1,7 @@
 package uap.node;
 
 import uap.flattener.IFlattener;
+import uap.node.interfaces.IAcceptor;
 
 import java.util.LinkedList;
 

@@ -1,4 +1,4 @@
-package uap.node;
+package uap.node.interfaces;
 
 import uap.flattener.IFlattener;
 
