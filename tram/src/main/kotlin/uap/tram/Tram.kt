@@ -10,6 +10,8 @@ import uap.tram.abstractMachine.AbstractMachine
 import uap.tram.filereader.FileReader
 
 internal object Tram {
+
+}
     fun main(argv: Array<String>) {
 
         println(System.getProperty("user.dir"))
@@ -51,6 +53,3 @@ internal object Tram {
         parser.parse(argv)
         return Pair(debug, input)
     }
-
-
-}

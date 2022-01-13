@@ -31,10 +31,32 @@ class TramCodeGenerator(private val ast: Node) {
             is ReadNode -> handleReadNode(node, rho)
             is OpNode -> handleOptNode(node, rho)
             is IfNode -> handleIfNode(node, rho)
+            is CallNode -> handleCallNode(node, rho)
+            is WhileNode -> handleWhileNode(node, rho)
+            is SemiNode -> handleSemiNode(node, rho)
 
             else -> node.children.forEach { codeNode(it, rho) }
 
         }
+    }
+
+    private fun handleSemiNode(node: SemiNode, rho: Map<String, AddressPair>) {
+        node.children.forEach {
+            codeNode(it, rho)
+            instructions.add(Pair(Instruction(Instruction.POP), null))
+        }
+    }
+
+    private fun handleWhileNode(node: WhileNode, rho: Map<String, AddressPair>) {
+        TODO("Not yet implemented")
+    }
+
+    private fun handleCallNode(node: CallNode, rho: Map<String, AddressPair>) {
+        node.children[1].children.forEach { codeNode(it, rho) }
+        val fname = (getFuncNameFromRho(node, rho)!!.loc as TramLabel).address
+        val args = node.children[1].children.size
+
+        instructions.add(Pair(Instruction(Instruction.INVOKE, args, fname, 0), null))
     }
 
     private fun handleIfNode(node: IfNode, rho: Map<String, AddressPair>) {
@@ -102,6 +124,10 @@ class TramCodeGenerator(private val ast: Node) {
     }
 
     private fun getFuncNameFromRho(node: FuncNode, rho: Map<String, AddressPair>): AddressPair? {
+        return rho[node.children[0].attribute]
+    }
+
+    private fun getFuncNameFromRho(node: CallNode, rho: Map<String, AddressPair>): AddressPair? {
         return rho[node.children[0].attribute]
     }
 
