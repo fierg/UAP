@@ -5,5 +5,5 @@ public class TramLabel {
         this.address = address;
     }
 
-    int address;
+    public int address;
 }
