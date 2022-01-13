@@ -1,17 +1,15 @@
 package uap.node;
 
-import uap.Instruction;
 import uap.node.address.AddressFactory;
 import uap.node.address.AddressPair;
 import uap.node.interfaces.ITramcodeGeneratable;
 
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
-public abstract class Node implements  ITramcodeGeneratable {
+public abstract class Node implements ITramcodeGeneratable {
     private String type;
     private Object attribute;
     private LinkedList<Node> children;
@@ -93,11 +91,22 @@ public abstract class Node implements  ITramcodeGeneratable {
         if (!children.isEmpty())
             //System.out.println("Handling default node: " + this.type + " on level " + nl);
             children.forEach(child -> rhoC.set(child.elab_def(rhoC.get(), nl)));
-            //System.out.println(rho.toString());
+        //System.out.println(rho.toString());
         return rhoC.get();
     }
 
+    /*
     public List<Instruction> code(Map<String, AddressPair> rho, int nl) {
-        return null;
+        LinkedList<Instruction> inst = new LinkedList<>();
+        if (!children.isEmpty())
+            //System.out.println("coding default node: " + this.type + " on level " + nl);
+            children.forEach(child -> {
+                List<Instruction> inst1 = child.code(rho, nl);
+                if (inst1 != null && !inst1.isEmpty()){
+                    inst.addAll(inst1);
+                }
+            });
+        return inst;
     }
+     */
 }

@@ -1,10 +1,8 @@
 
 package uap.node;
 
-import uap.Instruction;
 import uap.node.address.AddressPair;
 
-import java.util.List;
 import java.util.Map;
 
 public class AssignNode extends Node
@@ -27,6 +25,7 @@ public class AssignNode extends Node
         return rho;
     }
 
+    /*
     @Override
     public List<Instruction> code(Map<String, AddressPair> rho, int nl) {
         ExprNode expr = (ExprNode) this.getChildren().get(0);
@@ -39,4 +38,5 @@ public class AssignNode extends Node
         instructions.add(new Instruction(Instruction.STORE, (Integer) addressPair.getLoc(), nestingLevelToUse));
         return instructions;
     }
+     */
 }

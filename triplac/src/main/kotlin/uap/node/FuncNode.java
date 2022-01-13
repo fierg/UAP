@@ -1,6 +1,8 @@
 
 package uap.node;
 
+import kotlin.Pair;
+import uap.Instruction;
 import uap.node.address.AddressPair;
 
 import java.util.HashMap;
@@ -27,24 +29,20 @@ public class FuncNode extends Node {
                 functionName.set((String) node.getAttribute());
             } else if (ParamsNode.class.equals(node.getClass())) {
                 node.getChildren().forEach(innerNode -> {
-                    if (IDNode.class.equals(innerNode.getClass())){
+                    if (IDNode.class.equals(innerNode.getClass())) {
                         params.add((String) innerNode.getAttribute());
                     }
                 });
-            }
 
-            else if (BodyNode.class.equals(node.getClass())) {
                 //TODO handle rho, increment nesting level and create rho' ??
-                rhoC.put(functionName.get(), addressFactory.getNewLabelAddressPair(-1,nl));
-                params.forEach(param -> rhoC.put(param, addressFactory.getNewLabelAddressPair(-1,nl)));
+            } else if (BodyNode.class.equals(node.getClass())) {
+                rhoC.put(functionName.get(), addressFactory.getNewLabelAddressPair(-1, nl));
+                params.forEach(param -> rhoC.put(param, addressFactory.getNewLabelAddressPair(-1, nl)));
 
-                node.getChildren().forEach(innerNode -> {
-                    rhoC.putAll(node.elab_def(rhoC,nl + 1));
-                });
+                node.getChildren().forEach(innerNode -> rhoC.putAll(node.elab_def(rhoC, nl + 1)));
             }
         });
 
         return rhoC;
     }
-
 }

@@ -2,9 +2,9 @@ package uap;
 
 import de.unitrier.st.uap.*
 import uap.flattener.Flattener
-import uap.tram.abstractMachine.AbstractMachine
 import uap.generator.TramCodeGenerator
 import uap.node.Node
+import uap.tram.abstractMachine.AbstractMachine
 import java.io.BufferedWriter
 import java.io.FileReader
 import java.io.FileWriter
@@ -28,12 +28,14 @@ internal object Main {
         val f = Flattener()
         f.flatten(ast)
 
-        printAST(fileName,ast)
-
         val t = TramCodeGenerator(ast)
-        val output = t.generate()
+        val instructions = t.generate()
 
-        val abstractMachine = AbstractMachine(output.toTypedArray(),true)
+        for (instruction in instructions) {
+            println(instruction.toString())
+        }
+
+        val abstractMachine = AbstractMachine(instructions.map { it.first }.toTypedArray(),true)
         abstractMachine.run()
 
     }
