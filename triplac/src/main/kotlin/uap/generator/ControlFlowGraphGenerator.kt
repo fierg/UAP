@@ -1,11 +1,18 @@
 package uap.generator
 
+import com.mxgraph.layout.mxCircleLayout
+import com.mxgraph.layout.mxIGraphLayout
+import com.mxgraph.util.mxCellRenderer
 import org.jgrapht.Graphs
+import org.jgrapht.ext.JGraphXAdapter
 import org.jgrapht.graph.SimpleDirectedGraph
 import uap.cfg.CFG
 import uap.cfg.CFGNode
 import uap.cfg.Edge
 import uap.node.*
+import java.awt.Color
+import java.io.File
+import javax.imageio.ImageIO
 
 class ControlFlowGraphGenerator(private val ast: Node) {
 
@@ -51,7 +58,10 @@ class ControlFlowGraphGenerator(private val ast: Node) {
         node: DefNode,
         graph: SimpleDirectedGraph<CFGNode, Edge>
     ): CFG {
-        TODO("Not yet implemented")
+        node
+        //TODO
+        return CFG(graph, null, null)
+
     }
 
     private fun handleCallNode(
@@ -71,6 +81,7 @@ class ControlFlowGraphGenerator(private val ast: Node) {
         val ret = CFGNode(node, "RET")
 
         graph.addVertex(ret)
+        graph.addVertex(call)
         graph.addVertex(functionEntrypoints.first)
         graph.addVertex(functionEntrypoints.second)
 
@@ -79,7 +90,7 @@ class ControlFlowGraphGenerator(private val ast: Node) {
         }
 
         argCFGs.forEachIndexed { index, cfg ->
-            if (index < argCFGs.size){
+            if (index + 1 < argCFGs.size){
                 graph.addEdge(argCFGs[index].cfgOut, argCFGs[index+1].cfgIn)
             }
         }
@@ -229,6 +240,16 @@ class ControlFlowGraphGenerator(private val ast: Node) {
         val cfgNode = CFGNode(node, node.attribute.toString())
         graph.addVertex(cfgNode)
         return CFG(graph, cfgNode, cfgNode)
+    }
+
+    fun printGraphToImage(graph: CFG) {
+        val graphAdapter: JGraphXAdapter<CFGNode, Edge> = JGraphXAdapter(graph.graph)
+        val layout: mxIGraphLayout = mxCircleLayout(graphAdapter)
+        layout.execute(graphAdapter.getDefaultParent())
+
+        val image = mxCellRenderer.createBufferedImage(graphAdapter, null, 2.0, Color.WHITE, true, null)
+        val imgFile = File("data/graph.png")
+        //ImageIO.write(image, "PNG", imgFile)
     }
 
 }

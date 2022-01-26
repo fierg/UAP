@@ -29,6 +29,7 @@ internal object Main {
 
         val cfg = ControlFlowGraphGenerator(ast)
         val cfgGraph = cfg.generate()
+        cfg.printGraphToImage(cfgGraph)
 
         /*
         val t = TramCodeGenerator(ast)
