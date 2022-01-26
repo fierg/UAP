@@ -1,6 +1,6 @@
 package uap.visual
 
-import com.mxgraph.layout.mxCircleLayout
+import com.mxgraph.layout.hierarchical.mxHierarchicalLayout
 import com.mxgraph.layout.mxIGraphLayout
 import com.mxgraph.util.mxCellRenderer
 import org.jgrapht.ext.JGraphXAdapter
@@ -16,12 +16,14 @@ class VisualDemo {
     companion object {
         fun printGraphToImage(graph: CFG) {
             val graphAdapter: JGraphXAdapter<CFGNode, Edge> = JGraphXAdapter(graph.graph)
-            val layout: mxIGraphLayout = mxCircleLayout(graphAdapter)
+            val layout: mxIGraphLayout = mxHierarchicalLayout(graphAdapter)
+            //val layout: mxIGraphLayout = mxFastOrganicLayout(graphAdapter)
             layout.execute(graphAdapter.getDefaultParent())
 
             val image = mxCellRenderer.createBufferedImage(graphAdapter, null, 2.0, Color.WHITE, true, null)
-            val imgFile = File("data/graph.png")
+            val imgFile = File("triplac/data/graph.png")
             ImageIO.write(image, "PNG", imgFile)
+
         }
     }
 }

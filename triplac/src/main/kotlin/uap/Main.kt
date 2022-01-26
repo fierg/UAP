@@ -1,6 +1,7 @@
 package uap;
 
 import de.unitrier.st.uap.*
+import uap.export.DOTWriter
 import uap.flattener.Flattener
 import uap.generator.ControlFlowGraphGenerator
 import uap.node.Node
@@ -30,7 +31,7 @@ internal object Main {
 
         val cfg = ControlFlowGraphGenerator(ast)
         val cfgGraph = cfg.generate()
-        cfg.exportGraph(cfgGraph.graph)
+        DOTWriter.exportGraph(cfgGraph.graph)
         VisualDemo.printGraphToImage(cfgGraph)
 
         /*
