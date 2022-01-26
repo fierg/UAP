@@ -2,10 +2,8 @@ package uap;
 
 import de.unitrier.st.uap.*
 import uap.flattener.Flattener
-import uap.generator.ControlFlowGraph
-import uap.generator.TramCodeGenerator
+import uap.generator.ControlFlowGraphGenerator
 import uap.node.Node
-import uap.tram.abstractMachine.AbstractMachine
 import java.io.BufferedWriter
 import java.io.FileReader
 import java.io.FileWriter
@@ -29,19 +27,19 @@ internal object Main {
         val f = Flattener()
         f.flatten(ast)
 
+        val cfg = ControlFlowGraphGenerator(ast)
+        val cfgGraph = cfg.generate()
+
+        /*
         val t = TramCodeGenerator(ast)
         val instructions = t.generate()
 
         for (instruction in instructions) {
             println(instruction.toString())
         }
-
-        val cfg = ControlFlowGraph(ast)
-        cfg.generate()
-
         val abstractMachine = AbstractMachine(instructions.map { it.first }.toTypedArray(),true)
         abstractMachine.run()
-
+         */
     }
 
     private fun printAST(fileName: String, ast: Node) {
