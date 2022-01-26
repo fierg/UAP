@@ -6,25 +6,28 @@ import com.mxgraph.util.mxCellRenderer
 import org.jgrapht.Graphs
 import org.jgrapht.ext.JGraphXAdapter
 import org.jgrapht.graph.SimpleDirectedGraph
+import org.jgrapht.nio.dot.DOTExporter
 import uap.cfg.CFG
 import uap.cfg.CFGNode
 import uap.cfg.Edge
 import uap.node.*
 import java.awt.Color
 import java.io.File
+import java.io.StringWriter
 import javax.imageio.ImageIO
+
 
 class ControlFlowGraphGenerator(private val ast: Node) {
 
-    private val functionEnvironment = mutableMapOf<String, Pair<CFGNode, CFGNode>>()
+    private val functionEnvironment = mutableMapOf<String, Pair<CFGNode?, CFGNode?>>()
 
     fun generate(): CFG {
-        return generateCFG(ast)
+        return generateCFG(ast, SimpleDirectedGraph<CFGNode, Edge>(Edge::class.java))
     }
 
     private fun generateCFG(
         node: Node,
-        graph: SimpleDirectedGraph<CFGNode, Edge> = SimpleDirectedGraph<CFGNode, Edge>(Edge::class.java)
+        graph: SimpleDirectedGraph<CFGNode, Edge>
     ): CFG {
 
         println("handling node: ${node.type}")
@@ -38,13 +41,14 @@ class ControlFlowGraphGenerator(private val ast: Node) {
             is IfNode -> return handleIfNode(node, graph)
             is WhileNode -> return handleWhileNode(node, graph)
             is LetNode -> return handleLetNode(node, graph)
-            is DefNode -> return handleDefNode(node, graph)
+            is DefNode -> return handleDefaultSingleChild(node, graph)
             is BodyNode -> return handleDefaultSingleChild(node, graph)
             is CallNode -> return handleCallNode(node, graph)
+            is FuncNode -> return handleFuncNode(node, graph)
             else -> {
                 println("Unhandled node of type ${node.type}")
                 node.children.forEach {
-                    generateCFG(it)
+                    return generateCFG(it, graph)
                 }
                 // return CFG(graph,lastIn,lastOut)
             }
@@ -54,14 +58,21 @@ class ControlFlowGraphGenerator(private val ast: Node) {
         return CFG(graph, null, null)
     }
 
-    private fun handleDefNode(
-        node: DefNode,
-        graph: SimpleDirectedGraph<CFGNode, Edge>
-    ): CFG {
-        node
-        //TODO
-        return CFG(graph, null, null)
+    private fun handleFuncNode(node: FuncNode, graph: SimpleDirectedGraph<CFGNode, Edge>): CFG {
+        val body = node.children.filterIsInstance<BodyNode>().first()
+        val id = node.children.filterIsInstance<IDNode>().first()
 
+        val start = CFGNode(node, "START $id")
+        val end = CFGNode(node, "END $id")
+
+        functionEnvironment[id.attribute as String] = Pair(start, end)
+
+        val bodyResult = generateCFG(body, graph)
+
+        graph.addEdge(start, bodyResult.cfgIn)
+        graph.addEdge(bodyResult.cfgOut, end)
+
+        return CFG(graph, start, end)
     }
 
     private fun handleCallNode(
@@ -90,14 +101,14 @@ class ControlFlowGraphGenerator(private val ast: Node) {
         }
 
         argCFGs.forEachIndexed { index, cfg ->
-            if (index + 1 < argCFGs.size){
-                graph.addEdge(argCFGs[index].cfgOut, argCFGs[index+1].cfgIn)
+            if (index + 1 < argCFGs.size) {
+                graph.addEdge(argCFGs[index].cfgOut, argCFGs[index + 1].cfgIn)
             }
         }
-        graph.addEdge(argCFGs.last().cfgOut,call)
-        graph.addEdge(call,functionEntrypoints.first)
-        graph.addEdge(functionEntrypoints.second,ret)
-        graph.addEdge(call,ret)
+        graph.addEdge(argCFGs.last().cfgOut, call)
+        graph.addEdge(call, functionEntrypoints.first)
+        graph.addEdge(functionEntrypoints.second, ret)
+        graph.addEdge(call, ret)
 
         return CFG(graph, argCFGs.first().cfgIn, ret)
     }
@@ -121,15 +132,16 @@ class ControlFlowGraphGenerator(private val ast: Node) {
         graph: SimpleDirectedGraph<CFGNode, Edge>
     ): CFG {
         val bodyNode = node.children.filterIsInstance<BodyNode>().first()
-        val functionResults = mutableListOf<CFG>()
-        node.children.filterIsInstance<DefNode>()[0].children.forEach { defNode ->
-            val funcNode = defNode.children.first
-            val funcResult = generateCFG(funcNode)
-            functionResults.add(funcResult)
-            functionEnvironment[defNode.children.filterIsInstance<IDNode>().first().attribute as String] =
-                Pair(funcResult.cfgIn!!, funcResult.cfgOut!!)
+        val defResults = mutableListOf<CFG>()
+
+        node.children.filterIsInstance<DefNode>().forEach { defNode ->
+            val defResult = generateCFG(defNode, graph)
+            defResults.add(defResult)
+            functionEnvironment[defNode.children.first.children.first.attribute as String] =
+                Pair(defResult.cfgIn!!, defResult.cfgOut!!)
         }
-        val bodyResult = generateCFG(bodyNode)
+
+        val bodyResult = generateCFG(bodyNode, graph)
 
         return CFG(graph, bodyResult.cfgIn, bodyResult.cfgOut)
     }
@@ -165,9 +177,10 @@ class ControlFlowGraphGenerator(private val ast: Node) {
         node: IfNode,
         graph: SimpleDirectedGraph<CFGNode, Edge>
     ): CFG {
-        val condition = generateCFG(node.children.filterIsInstance<CondNode>().first())
-        val thenNode = generateCFG(node.children.filterIsInstance<ThenNode>().first())
-        val elseNode = generateCFG(node.children.filterIsInstance<ElseNode>().first())
+        val condition = generateCFG(node.children.filterIsInstance<CondNode>().first(), graph)
+        val thenNode = generateCFG(node.children.filterIsInstance<ThenNode>().first(), graph)
+        val elseNode = generateCFG(node.children.filterIsInstance<ElseNode>().first(), graph)
+
         val diamond = CFGNode(node, "diamond")
         val glue = CFGNode(node, "glue")
 
@@ -191,7 +204,7 @@ class ControlFlowGraphGenerator(private val ast: Node) {
         node: AssignNode,
         graph: SimpleDirectedGraph<CFGNode, Edge>
     ): CFG {
-        val result1 = generateCFG(node.children[0])
+        val result1 = generateCFG(node.children[0], graph)
         Graphs.addGraph(graph, result1.graph)
         val cfgNode = CFGNode(node = node)
         graph.addVertex(cfgNode)
@@ -205,8 +218,8 @@ class ControlFlowGraphGenerator(private val ast: Node) {
         node: SemiNode,
         graph: SimpleDirectedGraph<CFGNode, Edge>
     ): CFG {
-        val result1 = generateCFG(node.children[0])
-        val result2 = generateCFG(node.children[1])
+        val result1 = generateCFG(node.children[0], graph)
+        val result2 = generateCFG(node.children[1], graph)
         Graphs.addGraph(graph, result1.graph)
         Graphs.addGraph(graph, result2.graph)
         graph.addEdge(result1.cfgOut, result2.cfgIn)
@@ -218,14 +231,15 @@ class ControlFlowGraphGenerator(private val ast: Node) {
         node: OpNode,
         graph: SimpleDirectedGraph<CFGNode, Edge>
     ): CFG {
-        val result1 = generateCFG(node.children[0])
-        val result2 = generateCFG(node.children[1])
+        val result1 = generateCFG(node.children[0], graph)
+        val result2 = generateCFG(node.children[1], graph)
 
         Graphs.addGraph(graph, result1.graph)
         Graphs.addGraph(graph, result2.graph)
 
         val cfgNode = CFGNode(node = node)
 
+        graph.addVertex(cfgNode)
         graph.addEdge(result1.cfgOut, result2.cfgIn)
         graph.addEdge(result2.cfgOut, cfgNode)
 
@@ -242,14 +256,14 @@ class ControlFlowGraphGenerator(private val ast: Node) {
         return CFG(graph, cfgNode, cfgNode)
     }
 
-    fun printGraphToImage(graph: CFG) {
-        val graphAdapter: JGraphXAdapter<CFGNode, Edge> = JGraphXAdapter(graph.graph)
-        val layout: mxIGraphLayout = mxCircleLayout(graphAdapter)
-        layout.execute(graphAdapter.getDefaultParent())
 
-        val image = mxCellRenderer.createBufferedImage(graphAdapter, null, 2.0, Color.WHITE, true, null)
-        val imgFile = File("data/graph.png")
-        //ImageIO.write(image, "PNG", imgFile)
+    fun exportGraph(graph: SimpleDirectedGraph<CFGNode, Edge>) {
+        //Create the exporter (with ID provider)
+        val exporter2 =
+            DOTExporter<CFGNode, Edge> { v: CFGNode -> "${v.node.type}${v.node.hashCode()}" }
+        val writer = StringWriter()
+        exporter2.exportGraph(graph, writer)
+        println(writer.toString())
     }
 
 }
