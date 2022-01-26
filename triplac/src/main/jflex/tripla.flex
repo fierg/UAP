@@ -12,7 +12,7 @@ import java_cup.runtime.Symbol;
 /*
  * Options
  */
-%class Lexer  // Name of the lexer class will be Lexer.java
+%class Lexer
 %public
 %line         // Enables line count, accessed by yyline
 %column       // Enables column count, accessed by yycolumn

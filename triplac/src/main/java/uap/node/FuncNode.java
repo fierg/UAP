@@ -1,8 +1,6 @@
 
 package uap.node;
 
-import kotlin.Pair;
-import uap.Instruction;
 import uap.node.address.AddressPair;
 
 import java.util.HashMap;
@@ -18,7 +16,7 @@ public class FuncNode extends Node {
 
     @Override
     public Map<String, AddressPair> elab_def(Map<String, AddressPair> rho, int nl) {
-        System.out.println("Handling func node on level " + nl);
+        //System.out.println("Handling func node on level " + nl);
 
         Map<String, AddressPair> rhoC = new HashMap(rho);
         AtomicReference<String> functionName = new AtomicReference<>("");

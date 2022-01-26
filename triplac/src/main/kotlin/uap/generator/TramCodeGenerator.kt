@@ -75,7 +75,8 @@ class TramCodeGenerator(private val ast: Node) {
         rho: Map<String, AddressPair>
     ) {
         val add = rho[node.children.first.attribute]
-        instructions.add(Pair(Instruction(Instruction.LOAD, (add!!.loc as TramLabel).address, add.nl), null))
+        instructions.add(Pair(Instruction(Instruction.LOAD,
+            ((if(add!!.loc is Int) add.loc else (add.loc as TramLabel).address) as Int?) , add.nl), null))
     }
 
     private fun handleOptNode(node: OpNode, rho: Map<String, AddressPair>) {
