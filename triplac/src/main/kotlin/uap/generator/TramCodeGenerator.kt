@@ -138,6 +138,9 @@ class TramCodeGenerator(private val ast: Node) {
             "+" -> sym.ADD
             "-" -> sym.SUB
             "/" -> sym.DIV
+            "==" -> sym.EQ
+            "&gt;" -> sym.GT
+            "&lt;" -> sym.LT
             else -> throw IllegalStateException("Sym not found")
         }
     }
