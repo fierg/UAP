@@ -4,6 +4,7 @@ import de.unitrier.st.uap.*
 import uap.flattener.Flattener
 import uap.generator.ControlFlowGraphGenerator
 import uap.node.Node
+import uap.visual.VisualDemo
 import java.io.BufferedWriter
 import java.io.FileReader
 import java.io.FileWriter
@@ -29,7 +30,8 @@ internal object Main {
 
         val cfg = ControlFlowGraphGenerator(ast)
         val cfgGraph = cfg.generate()
-        cfg.printGraphToImage(cfgGraph)
+        cfg.exportGraph(cfgGraph.graph)
+        VisualDemo.printGraphToImage(cfgGraph)
 
         /*
         val t = TramCodeGenerator(ast)
