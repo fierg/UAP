@@ -38,10 +38,7 @@ class ControlFlowGraphGenerator(private val ast: Node) {
             is CallNode -> handleCallNode(node, graph)
             is FuncNode -> handleFuncNode(node, graph)
             else -> {
-                if (node is CondNode || node is ElseNode || node is ParNode || node is ThenNode || node is ReadNode || node is DefNode || node is BodyNode) return handleDefaultSingleChild(
-                    node,
-                    graph
-                )
+                if (node is CondNode || node is ElseNode || node is ParNode || node is ThenNode || node is ReadNode || node is DefNode || node is BodyNode || node is ExprNode) return handleDefaultSingleChild(node, graph)
                 println("Unhandled node of type ${node.type}. Performing CFG on first child as workaround.")
                 return generateCFG(node.children.first, graph)
             }
@@ -105,13 +102,11 @@ class ControlFlowGraphGenerator(private val ast: Node) {
 
     private fun handleDefaultSingleChild(node: Node, graph: SimpleDirectedGraph<CFGNode, Edge>): CFG {
         if (node.children.size > 1)
-            TODO("Not yet implemented")
+            throw IllegalArgumentException("Only nodes with a single child supported! Node: ${node.type}")
         else
             return generateCFG(node.children.first, graph)
     }
 
-
-    //TODO handle start and end nodes
     private fun handleLetNode(node: LetNode, graph: SimpleDirectedGraph<CFGNode, Edge>): CFG {
         val bodyNode = node.children.filterIsInstance<BodyNode>().first()
         val defResults = mutableListOf<CFG>()
@@ -137,6 +132,8 @@ class ControlFlowGraphGenerator(private val ast: Node) {
 
         val diamond = CFGNode(node, "diamond")
         val glue = CFGNode(node, "glue")
+        graph.addVertex(diamond)
+        graph.addVertex(glue)
 
         Graphs.addGraph(graph, condResult.graph)
         Graphs.addGraph(graph, expResult.graph)
