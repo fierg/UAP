@@ -139,8 +139,8 @@ class ControlFlowGraphGenerator(private val ast: Node) {
         Graphs.addGraph(graph, condResult.graph)
         Graphs.addGraph(graph, expResult.graph)
 
-        //This edge seems wrong... but is listed in the slides
-        graph.addEdge(condResult.cfgOut, expResult.cfgIn)
+        //This edge seems wrong... but is listed in the slides on page 7
+        //graph.addEdge(condResult.cfgOut, expResult.cfgIn)
 
         graph.addEdge(condResult.cfgOut, diamond)
         graph.addEdge(diamond, expResult.cfgIn, Edge("T"))

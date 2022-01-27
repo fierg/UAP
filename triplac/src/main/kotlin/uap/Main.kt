@@ -1,6 +1,8 @@
 package uap;
 
 import de.unitrier.st.uap.*
+import kotlinx.cli.ArgParser
+import kotlinx.cli.ArgType
 import uap.export.DOTWriter
 import uap.flattener.Flattener
 import uap.generator.ControlFlowGraphGenerator
@@ -14,12 +16,11 @@ import java.io.PrintWriter
 internal object Main {
     @JvmStatic
     fun main(args: Array<String>) {
-        if (args.isEmpty()) {
-            System.err.println("Please provide a file.")
-            return
-        }
+
         val ast: Node
-        val fileName = args[0]
+        val export = args[0].matches(Regex("-expcfg"))
+        val fileName = if (export) args[1] else args[0]
+
         val triplaParser = Parser(de.unitrier.st.uap.Lexer(FileReader(fileName)))
         ast = triplaParser.parse().value as Node
 
@@ -31,8 +32,11 @@ internal object Main {
 
         val cfg = ControlFlowGraphGenerator(ast)
         val cfgGraph = cfg.generate()
-        DOTWriter.exportGraph(cfgGraph.graph)
-        VisualDemo.printGraphToImage(cfgGraph)
+
+        if (export) {
+            VisualDemo.printGraphToImage(cfgGraph)
+            DOTWriter.exportGraph(cfgGraph.graph)
+        }
 
         /*
         val t = TramCodeGenerator(ast)
