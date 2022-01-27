@@ -1,8 +1,6 @@
 package uap;
 
 import de.unitrier.st.uap.*
-import kotlinx.cli.ArgParser
-import kotlinx.cli.ArgType
 import uap.export.DOTWriter
 import uap.flattener.Flattener
 import uap.generator.ControlFlowGraphGenerator
@@ -35,7 +33,7 @@ internal object Main {
 
         if (export) {
             VisualDemo.printGraphToImage(cfgGraph)
-            DOTWriter.exportGraph(cfgGraph.graph)
+            DOTWriter.exportGraph(cfgGraph)
         }
 
         /*

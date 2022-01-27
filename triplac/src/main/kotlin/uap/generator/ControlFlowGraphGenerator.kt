@@ -60,6 +60,8 @@ class ControlFlowGraphGenerator(private val ast: Node) {
 
         val bodyResult = generateCFG(body, graph)
 
+        graph.addVertex(start)
+        graph.addVertex(end)
         graph.addEdge(start, bodyResult.cfgIn)
         graph.addEdge(bodyResult.cfgOut, end)
 
@@ -139,7 +141,7 @@ class ControlFlowGraphGenerator(private val ast: Node) {
         Graphs.addGraph(graph, condResult.graph)
         Graphs.addGraph(graph, expResult.graph)
 
-        //This edge seems wrong... but is listed in the slides on page 7
+        //This edge seems wrong... but is listed in the slides on page 7 ??
         //graph.addEdge(condResult.cfgOut, expResult.cfgIn)
 
         graph.addEdge(condResult.cfgOut, diamond)
@@ -150,6 +152,7 @@ class ControlFlowGraphGenerator(private val ast: Node) {
         return CFG(graph, condResult.cfgIn, glue)
     }
 
+    //TODO fix wrong paths
     private fun handleIfNode(node: IfNode, graph: SimpleDirectedGraph<CFGNode, Edge>): CFG {
         val condition = generateCFG(node.children.filterIsInstance<CondNode>().first(), graph)
         val thenNode = generateCFG(node.children.filterIsInstance<ThenNode>().first(), graph)
@@ -171,13 +174,15 @@ class ControlFlowGraphGenerator(private val ast: Node) {
         graph.addEdge(thenNode.cfgOut, glue)
         graph.addEdge(elseNode.cfgOut, glue)
 
-        return CFG(graph, elseNode.cfgIn, glue)
+        //
+        return CFG(graph, condition.cfgIn, glue)
     }
 
     private fun handleAssignNode(node: AssignNode, graph: SimpleDirectedGraph<CFGNode, Edge>): CFG {
         val result1 = generateCFG(node.children[0], graph)
         Graphs.addGraph(graph, result1.graph)
-        val cfgNode = CFGNode(node = node)
+        val label = node.children.filterIsInstance<IDNode>().first().attribute
+        val cfgNode = CFGNode(node,"$label = e")
         graph.addVertex(cfgNode)
         graph.addEdge(result1.cfgOut, cfgNode)
 
@@ -202,7 +207,8 @@ class ControlFlowGraphGenerator(private val ast: Node) {
         Graphs.addGraph(graph, result1.graph)
         Graphs.addGraph(graph, result2.graph)
 
-        val cfgNode = CFGNode(node = node)
+        val label = node.attribute.toString()
+        val cfgNode = CFGNode(node, label)
 
         graph.addVertex(cfgNode)
         graph.addEdge(result1.cfgOut, result2.cfgIn)
