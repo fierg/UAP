@@ -54,6 +54,7 @@ LineTerminator  = \r | \n | \r\n
 WhiteSpace      = {LineTerminator} | [ \t\f]
 PositiveInteger = 0 | [1-9][0-9]*
 Identifier      = [A-Za-z_][A-Za-z_0-9]*
+Boolean         = true | false
 
 /* Comments */
 TraditionalComment = "/*" [^*] ~"*/" | "/*" "*"+ "/"
@@ -78,6 +79,10 @@ Comment = {TraditionalComment} | {EndOfLineComment} |
     "else"  { return createSymbol(sym.ELSE); }
     "do"    { return createSymbol(sym.DO); }
     "while" { return createSymbol(sym.WHILE); }
+
+    //boolean
+    "true"  {return createSymbol(sym.TRUE);}
+    "false" {return createSymbol(sym.FALSE);}
 
     // Parentheses tokens
     "(" { return createSymbol(sym.LPAR); }
