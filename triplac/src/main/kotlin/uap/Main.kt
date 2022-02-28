@@ -14,6 +14,7 @@ import java.io.PrintWriter
 internal object Main {
     @JvmStatic
     fun main(args: Array<String>) {
+        Thread.sleep(100)
 
         val ast: Node
         val export = args[0].matches(Regex("-expcfg"))

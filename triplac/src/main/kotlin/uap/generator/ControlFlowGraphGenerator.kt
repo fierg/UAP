@@ -7,7 +7,6 @@ import uap.cfg.CFGNode
 import uap.cfg.Edge
 import uap.node.*
 
-
 class ControlFlowGraphGenerator(private val ast: Node) {
 
     private val functionEnvironment = mutableMapOf<String, Pair<CFGNode?, CFGNode?>>()
@@ -38,7 +37,10 @@ class ControlFlowGraphGenerator(private val ast: Node) {
             is CallNode -> handleCallNode(node, graph)
             is FuncNode -> handleFuncNode(node, graph)
             else -> {
-                if (node is CondNode || node is ElseNode || node is ParNode || node is ThenNode || node is ReadNode || node is DefNode || node is BodyNode || node is ExprNode) return handleDefaultSingleChild(node, graph)
+                if (node is CondNode || node is ElseNode || node is ParNode || node is ThenNode || node is ReadNode || node is DefNode || node is BodyNode || node is ExprNode) return handleDefaultSingleChild(
+                    node,
+                    graph
+                )
                 println("Unhandled node of type ${node.type}. Performing CFG on first child as workaround.")
                 return generateCFG(node.children.first, graph)
             }
@@ -52,9 +54,7 @@ class ControlFlowGraphGenerator(private val ast: Node) {
 
         val start = CFGNode(node, "START ${id.attribute}$params")
         val end = CFGNode(node, "END ${id.attribute}$params")
-
         functionEnvironment[id.attribute as String] = Pair(start, end)
-
         val bodyResult = generateCFG(body, graph)
 
         graph.addVertex(start)
@@ -90,7 +90,6 @@ class ControlFlowGraphGenerator(private val ast: Node) {
         argCFGs.forEachIndexed { index, _ ->
             if (index + 1 < argCFGs.size)
                 graph.addEdge(argCFGs[index].cfgOut, argCFGs[index + 1].cfgIn)
-
         }
         graph.addEdge(argCFGs.last().cfgOut, call)
         graph.addEdge(call, functionEntrypoint.first)
@@ -154,7 +153,6 @@ class ControlFlowGraphGenerator(private val ast: Node) {
         val condition = generateCFG(node.children.filterIsInstance<CondNode>().first(), graph)
         val thenNode = generateCFG(node.children.filterIsInstance<ThenNode>().first(), graph)
         val elseNode = generateCFG(node.children.filterIsInstance<ElseNode>().first(), graph)
-
         val diamond = CFGNode(node, "diamond")
         val glue = CFGNode(node, "glue")
 
@@ -171,7 +169,6 @@ class ControlFlowGraphGenerator(private val ast: Node) {
         graph.addEdge(thenNode.cfgOut, glue)
         graph.addEdge(elseNode.cfgOut, glue)
 
-        //
         return CFG(graph, condition.cfgIn, glue)
     }
 
@@ -179,12 +176,11 @@ class ControlFlowGraphGenerator(private val ast: Node) {
         val result1 = generateCFG(node.children[0], graph)
         Graphs.addGraph(graph, result1.graph)
         val label = node.children.filterIsInstance<IDNode>().first().attribute
-        val cfgNode = CFGNode(node,"$label = e")
+        val cfgNode = CFGNode(node, "$label = e")
         graph.addVertex(cfgNode)
         graph.addEdge(result1.cfgOut, cfgNode)
 
         return CFG(graph, result1.cfgIn, cfgNode)
-
     }
 
     private fun handleSemiNode(node: SemiNode, graph: SimpleDirectedGraph<CFGNode, Edge>): CFG {
@@ -194,7 +190,16 @@ class ControlFlowGraphGenerator(private val ast: Node) {
         Graphs.addGraph(graph, result2.graph)
         graph.addEdge(result1.cfgOut, result2.cfgIn)
 
-        return CFG(graph, result1.cfgIn, result2.cfgOut)
+        var nextCFG: CFG
+        var lastCFG = result2
+        node.children.filterIndexed { index, _ -> index >= 2 }.forEach { nextNode ->
+            nextCFG = generateCFG(nextNode, graph)
+            Graphs.addGraph(graph, nextCFG.graph)
+            graph.addEdge(lastCFG.cfgOut, nextCFG.cfgIn)
+            lastCFG = nextCFG
+        }
+        return CFG(graph, result1.cfgIn, lastCFG.cfgOut)
+
     }
 
     private fun handleOptNode(node: OpNode, graph: SimpleDirectedGraph<CFGNode, Edge>): CFG {
