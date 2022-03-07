@@ -20,20 +20,26 @@ class DOTWriter {
                 val map: MutableMap<String, Attribute> = LinkedHashMap()
                 val label = if (v.label.isNotBlank()) v.label else if (v.node.attribute != null) v.node.attribute.toString() else throw IllegalArgumentException("Unhandled node type: $v")
 
-                if (v == cfgGraph.cfgIn || v == cfgGraph.cfgOut){
-                    map["shape"] = DefaultAttribute.createAttribute("doublecircle")
-                    map["label"] = DefaultAttribute.createAttribute(label)
-                } else if (label == "diamond") {
-                    map["shape"] = DefaultAttribute.createAttribute(label)
-                    map["label"] = DefaultAttribute.createAttribute("?")
-                } else if (label == "glue") {
-                    map["label"] = DefaultAttribute.createAttribute("")
-                    map["shape"] = DefaultAttribute.createAttribute("point")
-                } else if (label.startsWith("START") || label.startsWith("END") || label.startsWith("CALL") || label.startsWith("RET")) {
-                    map["label"] = DefaultAttribute.createAttribute(label)
-                    map["shape"] = DefaultAttribute.createAttribute("box")
-                } else {
-                    map["label"] = DefaultAttribute.createAttribute(label)
+                when {
+                    (v == cfgGraph.cfgIn || v == cfgGraph.cfgOut) -> {
+                        map["shape"] = DefaultAttribute.createAttribute("doublecircle")
+                        map["label"] = DefaultAttribute.createAttribute(label)
+                    }
+                    (label == "diamond") -> {
+                        map["shape"] = DefaultAttribute.createAttribute(label)
+                        map["label"] = DefaultAttribute.createAttribute("?")
+                    }
+                    (label == "glue") -> {
+                        map["label"] = DefaultAttribute.createAttribute("")
+                        map["shape"] = DefaultAttribute.createAttribute("point")
+                    }
+                    (label.startsWith("START") || label.startsWith("END") || label.startsWith("CALL") || label.startsWith("RET")) -> {
+                        map["label"] = DefaultAttribute.createAttribute(label)
+                        map["shape"] = DefaultAttribute.createAttribute("box")
+                    }
+                    else -> {
+                        map["label"] = DefaultAttribute.createAttribute(label)
+                    }
                 }
                 map
             }

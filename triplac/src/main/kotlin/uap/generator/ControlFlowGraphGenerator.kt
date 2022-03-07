@@ -173,7 +173,8 @@ class ControlFlowGraphGenerator(private val ast: Node) {
     }
 
     private fun handleAssignNode(node: AssignNode, graph: SimpleDirectedGraph<CFGNode, Edge>): CFG {
-        val result1 = generateCFG(node.children[0], graph)
+        //TODO handle expression of all children not only child 1 ?
+        val result1 = generateCFG(node.children[1], graph)
         Graphs.addGraph(graph, result1.graph)
         val label = node.children.filterIsInstance<IDNode>().first().attribute
         val cfgNode = CFGNode(node, "$label = e")
