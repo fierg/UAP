@@ -18,7 +18,9 @@ class DOTWriter {
             val exporter = DOTExporter<CFGNode, Edge>()
             exporter.setVertexAttributeProvider { v ->
                 val map: MutableMap<String, Attribute> = LinkedHashMap()
-                val label = if (v.label.isNotBlank()) v.label else if (v.node.attribute != null) v.node.attribute.toString() else throw IllegalArgumentException("Unhandled node type: $v")
+                var label = if (v.label.isNotBlank()) v.label else if (v.node.attribute != null) v.node.attribute.toString() else throw IllegalArgumentException("Unhandled node type: $v")
+                if (v.gen.isNotEmpty()) label += " gen: ${v.gen}"
+                if (v.kill.isNotEmpty()) label += " kill: ${v.kill}"
 
                 when {
                     (v == cfgGraph.cfgIn || v == cfgGraph.cfgOut) -> {

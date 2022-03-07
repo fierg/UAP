@@ -10,6 +10,8 @@ import java.io.BufferedWriter
 import java.io.FileReader
 import java.io.FileWriter
 import java.io.PrintWriter
+import de.unitrier.st.uap.*
+import uap.analysis.DataFlowAnalysis
 
 internal object Main {
     @JvmStatic
@@ -31,6 +33,8 @@ internal object Main {
 
         val cfg = ControlFlowGraphGenerator(ast)
         val cfgGraph = cfg.generate()
+
+        DataFlowAnalysis.analyzeLiveVariables(cfgGraph)
 
         if (export) {
             VisualDemo.printGraphToImage(cfgGraph)

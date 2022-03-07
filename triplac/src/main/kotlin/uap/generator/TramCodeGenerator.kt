@@ -36,7 +36,6 @@ class TramCodeGenerator(private val ast: Node) {
             is SemiNode -> handleSemiNode(node, rho)
 
             else -> node.children.forEach { codeNode(it, rho) }
-
         }
     }
 

@@ -1,5 +1,11 @@
-let f(x, y, z) {
-    y = 2;
-    z = 3;
-    x = y + 3
-} in f(2, 3)
+let f(x,y,z) {
+y=2;
+z=3;
+let g(x) {
+x=7;
+if (y>0)
+then g(y)
+else x=8;
+x
+} in g(x)+x
+} in f(2,3,0)
