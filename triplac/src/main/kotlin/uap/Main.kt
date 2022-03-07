@@ -34,6 +34,11 @@ internal object Main {
         val cfg = ControlFlowGraphGenerator(ast)
         val cfgGraph = cfg.generate()
 
+        if (export) {
+            VisualDemo.printGraphToImage(cfgGraph)
+            DOTWriter.exportGraph(cfgGraph)
+        }
+
         DataFlowAnalysis.analyzeLiveVariables(cfgGraph)
 
         if (export) {
