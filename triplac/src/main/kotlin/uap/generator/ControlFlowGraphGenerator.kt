@@ -118,7 +118,6 @@ class ControlFlowGraphGenerator(private val ast: Node) {
         }
 
         val bodyResult = generateCFG(bodyNode, graph)
-
         return CFG(graph, bodyResult.cfgIn, bodyResult.cfgOut)
     }
 
@@ -139,7 +138,6 @@ class ControlFlowGraphGenerator(private val ast: Node) {
 
         //This edge seems wrong... but is listed in the slides on page 7 ??
         //graph.addEdge(condResult.cfgOut, expResult.cfgIn)
-
         graph.addEdge(condResult.cfgOut, diamond)
         graph.addEdge(diamond, expResult.cfgIn, Edge("T"))
         graph.addEdge(diamond, glue, Edge("F"))
@@ -148,7 +146,6 @@ class ControlFlowGraphGenerator(private val ast: Node) {
         return CFG(graph, condResult.cfgIn, glue)
     }
 
-    //TODO fix wrong paths
     private fun handleIfNode(node: IfNode, graph: SimpleDirectedGraph<CFGNode, Edge>): CFG {
         val condition = generateCFG(node.children.filterIsInstance<CondNode>().first(), graph)
         val thenNode = generateCFG(node.children.filterIsInstance<ThenNode>().first(), graph)

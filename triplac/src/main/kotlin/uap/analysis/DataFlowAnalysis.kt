@@ -5,6 +5,8 @@ import org.jgrapht.graph.EdgeReversedGraph
 import org.jgrapht.traverse.BreadthFirstIterator
 import org.jgrapht.traverse.DepthFirstIterator
 import uap.cfg.CFG
+import uap.cfg.CFGNode
+import uap.cfg.Edge
 import uap.node.IDNode
 import uap.node.ParamsNode
 
@@ -12,17 +14,25 @@ class DataFlowAnalysis {
     companion object {
         fun analyzeLiveVariables(cfgGraph: CFG) {
             initGenAndKill(cfgGraph)
-
             val invertedGraph = EdgeReversedGraph(cfgGraph.graph)
+
+            //Initial round
             BreadthFirstIterator(invertedGraph,cfgGraph.cfgOut).forEach { currentNode ->
-                //println("${currentNode.node.type} ${currentNode.label} ${currentNode.inSet} ${currentNode.outSet}")
-                Graphs.predecessorListOf(invertedGraph, currentNode).forEach {
-                    currentNode.outSet.addAll(it.inSet)
-                }
-                val newOutSet = currentNode.outSet.toMutableSet()
-                newOutSet.removeAll(currentNode.kill)
-                newOutSet.addAll(currentNode.gen)
+                updateNode(invertedGraph, currentNode)
             }
+
+            //TODO: repeat until no further changes are made
+
+        }
+
+        private fun updateNode(invertedGraph: EdgeReversedGraph<CFGNode, Edge>, currentNode: CFGNode) {
+            Graphs.predecessorListOf(invertedGraph, currentNode).forEach {
+                currentNode.outSet.addAll(it.inSet)
+            }
+            val newOutSet = currentNode.outSet.toMutableSet()
+            newOutSet.removeAll(currentNode.kill)
+            newOutSet.addAll(currentNode.gen)
+            currentNode.outSet = newOutSet
         }
 
         private fun initGenAndKill(cfgGraph: CFG) {

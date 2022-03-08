@@ -1,5 +1,7 @@
 package uap.export
 
+import org.jgrapht.Graphs
+import org.jgrapht.graph.SimpleDirectedGraph
 import org.jgrapht.nio.Attribute
 import org.jgrapht.nio.DefaultAttribute
 import org.jgrapht.nio.dot.DOTExporter
@@ -15,26 +17,11 @@ class DOTWriter {
         fun exportGraph(cfgGraph: CFG) {
             //Create the exporter (with custom provider)
             val exporter = DOTExporter<CFGNode, Edge>()
-            val infoNodes = mutableSetOf<Pair<CFGNode, CFGNode>>()
-
-            cfgGraph.graph.vertexSet().forEachIndexed { _, v ->
-                if (v.gen.isNotEmpty() || v.kill.isNotEmpty() || v.inSet.isNotEmpty() || v.outSet.isNotEmpty()) {
-                    val analysisNode =
-                        CFGNode(v.node, label = "G: ${v.gen.toString().replace(Regex("\\[|\\]"),"")} | K: ${v.kill.toString().replace(Regex("\\[|\\]"),"")} | I: ${v.inSet.toString().replace(Regex("\\[|\\]"),"")} | O: ${v.outSet.toString().replace(Regex("\\[|\\]"),"")}")
-                    infoNodes.add(Pair(analysisNode, v))
-                }
-            }
-            infoNodes.forEach { pair ->
-                cfgGraph.graph.addVertex(pair.first)
-                cfgGraph.graph.addEdge(pair.first, pair.second, Edge("undirected"))
-            }
+            val graph = addInfoNodesToGraph(cfgGraph)
 
             exporter.setVertexAttributeProvider { v ->
                 val map: MutableMap<String, Attribute> = LinkedHashMap()
-                val label =
-                    if (v.label.isNotBlank()) v.label else if (v.node.attribute != null) v.node.attribute.toString() else throw IllegalArgumentException(
-                        "Unhandled node type: $v"
-                    )
+                val label = if (v.label.isNotBlank()) v.label else if (v.node.attribute != null) v.node.attribute.toString() else throw IllegalArgumentException("Unhandled node type: $v")
 
                 when {
                     (v == cfgGraph.cfgIn || v == cfgGraph.cfgOut) -> {
@@ -58,6 +45,7 @@ class DOTWriter {
                     (label.startsWith("G: ")) -> {
                         map["shape"] = DefaultAttribute.createAttribute("note")
                         map["label"] = DefaultAttribute.createAttribute(label)
+                        map["color"] = DefaultAttribute.createAttribute("green")
                     }
                     else -> {
                         map["label"] = DefaultAttribute.createAttribute(label)
@@ -77,8 +65,26 @@ class DOTWriter {
             }
 
             val writer = StringWriter()
-            exporter.exportGraph(cfgGraph.graph, writer)
+            exporter.exportGraph(graph, writer)
             println(writer.toString())
+        }
+
+        private fun addInfoNodesToGraph(cfgGraph: CFG): SimpleDirectedGraph<CFGNode, Edge> {
+            val infoNodes = mutableSetOf<Pair<CFGNode, CFGNode>>()
+            val graph = SimpleDirectedGraph<CFGNode,Edge>(Edge::class.java)
+            Graphs.addGraph(graph,cfgGraph.graph)
+
+            cfgGraph.graph.vertexSet().forEachIndexed { _, v ->
+                if (v.gen.isNotEmpty() || v.kill.isNotEmpty() || v.inSet.isNotEmpty() || v.outSet.isNotEmpty()) {
+                    val analysisNode = CFGNode(v.node, label = "G: ${v.gen.toString().replace(Regex("\\[|\\]"), "")} | K: ${v.kill.toString().replace(Regex("\\[|\\]"), "")} | I: ${v.inSet.toString().replace(Regex("\\[|\\]"), "")} | O: ${v.outSet.toString().replace(Regex("\\[|\\]"), "")}")
+                    infoNodes.add(Pair(analysisNode, v))
+                }
+            }
+            infoNodes.forEach { pair ->
+                graph.addVertex(pair.first)
+                graph.addEdge(pair.first, pair.second, Edge("undirected"))
+            }
+            return graph
         }
     }
 }
