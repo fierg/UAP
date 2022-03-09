@@ -8,6 +8,7 @@ import org.jgrapht.nio.dot.DOTExporter
 import uap.cfg.CFG
 import uap.cfg.CFGNode
 import uap.cfg.Edge
+import uap.node.CallNode
 import uap.node.ConstNode
 import uap.node.IDNode
 import java.io.StringWriter
@@ -76,9 +77,13 @@ class DOTWriter {
             val graph = SimpleDirectedGraph<CFGNode,Edge>(Edge::class.java)
             Graphs.addGraph(graph,cfgGraph.graph)
 
-            cfgGraph.graph.vertexSet().filterNot { it.node is ConstNode || it.label == "glue" }.forEachIndexed { _, v ->
+            cfgGraph.graph.vertexSet().filterNot { it.node is ConstNode || it.label == "glue" || it.node is CallNode || it == cfgGraph.cfgIn }.forEachIndexed { _, v ->
                 if (v.gen.isNotEmpty() || v.kill.isNotEmpty() || v.inSet.isNotEmpty() || v.outSet.isNotEmpty()) {
                     val analysisNode = CFGNode(v.node, label = "G: ${v.gen.toString().replace(Regex("\\[|\\]"), "")} | K: ${v.kill.toString().replace(Regex("\\[|\\]"), "")} | I: ${v.inSet.toString().replace(Regex("\\[|\\]"), "")} | O: ${v.outSet.toString().replace(Regex("\\[|\\]"), "")}")
+                    infoNodes.add(Pair(analysisNode, v))
+                }
+                if (v.ruGenSet.isNotEmpty() || v.ruKillSet.isNotEmpty() || v.ruInSet.isNotEmpty() || v.ruOutSet.isNotEmpty()) {
+                    val analysisNode = CFGNode(v.node, label = "G: ${v.ruGenSet.toString().replace(Regex("\\[|\\]"), "")} | K: ${v.ruKillSet.map { it.second }.toString().replace(Regex("\\[|\\]"), "")} | I: ${v.ruInSet.toString().replace(Regex("\\[|\\]"), "")} | O: ${v.ruOutSet.toString().replace(Regex("\\[|\\]"), "")}")
                     infoNodes.add(Pair(analysisNode, v))
                 }
             }

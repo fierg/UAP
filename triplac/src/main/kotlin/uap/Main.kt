@@ -39,7 +39,9 @@ internal object Main {
             DOTWriter.exportGraph(cfgGraph)
         }
 
-        DataFlowAnalysis.analyzeLiveVariables(cfgGraph, export)
+        //DataFlowAnalysis.analyzeLiveVariables(cfgGraph, export)
+        DataFlowAnalysis.analyzeReachedUses(cfgGraph,export)
+
 
         /*
         val t = TramCodeGenerator(ast)
