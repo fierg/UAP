@@ -10,7 +10,6 @@ import java.io.BufferedWriter
 import java.io.FileReader
 import java.io.FileWriter
 import java.io.PrintWriter
-import de.unitrier.st.uap.*
 import uap.analysis.DataFlowAnalysis
 
 internal object Main {
@@ -35,16 +34,12 @@ internal object Main {
         val cfgGraph = cfg.generate()
 
         if (export) {
+            println("Pure CFG")
             VisualDemo.printGraphToImage(cfgGraph)
             DOTWriter.exportGraph(cfgGraph)
         }
 
-        DataFlowAnalysis.analyzeLiveVariables(cfgGraph)
-
-        if (export) {
-            VisualDemo.printGraphToImage(cfgGraph)
-            DOTWriter.exportGraph(cfgGraph)
-        }
+        DataFlowAnalysis.analyzeLiveVariables(cfgGraph, export)
 
         /*
         val t = TramCodeGenerator(ast)

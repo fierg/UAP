@@ -8,6 +8,8 @@ import org.jgrapht.nio.dot.DOTExporter
 import uap.cfg.CFG
 import uap.cfg.CFGNode
 import uap.cfg.Edge
+import uap.node.ConstNode
+import uap.node.IDNode
 import java.io.StringWriter
 
 
@@ -74,7 +76,7 @@ class DOTWriter {
             val graph = SimpleDirectedGraph<CFGNode,Edge>(Edge::class.java)
             Graphs.addGraph(graph,cfgGraph.graph)
 
-            cfgGraph.graph.vertexSet().forEachIndexed { _, v ->
+            cfgGraph.graph.vertexSet().filterNot { it.node is ConstNode || it.label == "glue" }.forEachIndexed { _, v ->
                 if (v.gen.isNotEmpty() || v.kill.isNotEmpty() || v.inSet.isNotEmpty() || v.outSet.isNotEmpty()) {
                     val analysisNode = CFGNode(v.node, label = "G: ${v.gen.toString().replace(Regex("\\[|\\]"), "")} | K: ${v.kill.toString().replace(Regex("\\[|\\]"), "")} | I: ${v.inSet.toString().replace(Regex("\\[|\\]"), "")} | O: ${v.outSet.toString().replace(Regex("\\[|\\]"), "")}")
                     infoNodes.add(Pair(analysisNode, v))
