@@ -13,14 +13,18 @@ import uap.node.ConstNode
 import uap.node.IDNode
 import java.io.StringWriter
 
-
 class DOTWriter {
     companion object {
 
         fun exportGraph(cfgGraph: CFG) {
             //Create the exporter (with custom provider)
             val exporter = DOTExporter<CFGNode, Edge>()
-            val graph = addInfoNodesToGraph(cfgGraph)
+            val debug = false
+            val graph : SimpleDirectedGraph<CFGNode, Edge> = if (debug){
+                addInfoNodesToGraph(cfgGraph)
+            } else {
+                cfgGraph.graph
+            }
 
             exporter.setVertexAttributeProvider { v ->
                 val map: MutableMap<String, Attribute> = LinkedHashMap()

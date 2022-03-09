@@ -2,12 +2,14 @@ package uap.analysis
 
 import org.jgrapht.Graphs
 import org.jgrapht.graph.EdgeReversedGraph
+import org.jgrapht.traverse.BreadthFirstIterator
 import org.jgrapht.traverse.DepthFirstIterator
 import uap.cfg.CFG
 import uap.cfg.CFGNode
 import uap.cfg.Edge
 import uap.export.DOTWriter
 import uap.node.AssignNode
+import uap.node.FuncNode
 import uap.node.IDNode
 import uap.node.ParamsNode
 
@@ -40,7 +42,7 @@ class DataFlowAnalysis {
             var updatePerformed: Boolean
             do {
                 updatePerformed = false
-                DepthFirstIterator(invertedGraph,cfgGraph.cfgOut).forEach { currentNode ->
+                BreadthFirstIterator(invertedGraph,cfgGraph.cfgOut).forEach { currentNode ->
                     updatePerformed = updateReachedUsesOfNode(invertedGraph, currentNode) || updatePerformed
                 }
                 if (updatePerformed) println("changes detected, performing another iteration...")
@@ -50,14 +52,26 @@ class DataFlowAnalysis {
             println("Adding data flow edges to CFG")
             DepthFirstIterator(cfgGraph.graph,cfgGraph.cfgIn).forEach {
                 when(it.node) {
-                    is AssignNode -> handleAssignNodeEdge(it, cfgGraph)
+                    is AssignNode -> handleAssignNodeEdges(it, cfgGraph)
+                    is FuncNode -> handleFuncNodeEdges(it,cfgGraph)
                 }
             }
 
             handleExport(export,cfgGraph,"CFG after finding a fix point:")
         }
 
-        private fun handleAssignNodeEdge(node: CFGNode, cfgGraph: CFG) {
+        private fun handleFuncNodeEdges(node: CFGNode, cfgGraph: CFG) {
+            if (node.label.startsWith("START")) {
+                val variables = node.ruKillSet.map { it.second }
+                val uses = node.ruOutSet.filter { variables.contains(it.second) }
+
+                uses.forEach {
+                    cfgGraph.graph.addEdge(node, it.first,Edge("dataflow"))
+                }
+            }
+        }
+
+        private fun handleAssignNodeEdges(node: CFGNode, cfgGraph: CFG) {
             val variable = node.ruKillSet.first().second
             val uses = node.ruOutSet.filter { it.second == variable }
 
@@ -73,7 +87,8 @@ class DataFlowAnalysis {
                 currentNode.ruOutSet.addAll(it.ruInSet)
             }
             val newInSet = currentNode.ruOutSet.toMutableSet()
-            newInSet.removeAll(currentNode.ruKillSet)
+            newInSet.removeIf { node -> currentNode.ruKillSet.map { it.second }.contains(node.second) }
+            //newInSet.removeAll(currentNode.ruKillSet)
             newInSet.addAll(currentNode.ruGenSet)
 
             if (currentNode.ruInSet != newInSet || oldOut != currentNode.ruOutSet){

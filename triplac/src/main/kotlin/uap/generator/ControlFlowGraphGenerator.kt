@@ -36,8 +36,9 @@ class ControlFlowGraphGenerator(private val ast: Node) {
             is LetNode -> handleLetNode(node, graph)
             is CallNode -> handleCallNode(node, graph)
             is FuncNode -> handleFuncNode(node, graph)
+            is DefNode -> handleDefNode(node,graph)
             else -> {
-                if (node is CondNode || node is ElseNode || node is ParNode || node is ThenNode || node is ReadNode || node is DefNode || node is BodyNode || node is ExprNode) return handleDefaultSingleChild(
+                if (node is CondNode || node is ElseNode || node is ParNode || node is ThenNode || node is ReadNode || node is BodyNode || node is ExprNode) return handleDefaultSingleChild(
                     node,
                     graph
                 )
@@ -47,13 +48,18 @@ class ControlFlowGraphGenerator(private val ast: Node) {
         }
     }
 
+    private fun handleDefNode(node: DefNode, graph: SimpleDirectedGraph<CFGNode, Edge>): CFG {
+        return generateCFG(node.children.first, graph)
+        //TODO: fix me
+    }
+
     private fun handleFuncNode(node: FuncNode, graph: SimpleDirectedGraph<CFGNode, Edge>): CFG {
         val body = node.children.filterIsInstance<BodyNode>().first()
         val id = node.children.filterIsInstance<IDNode>().first()
         val params = node.children.filterIsInstance<ParamsNode>().first().children.map { it.attribute }.toString()
 
-        val start = CFGNode(node, "START ${id.attribute}$params")
-        val end = CFGNode(node, "END ${id.attribute}$params")
+        val start = CFGNode(node, "START ${id.attribute}$params", marksSubCFG = true)
+        val end = CFGNode(node, "END ${id.attribute}$params",marksSubCFG = true)
         functionEnvironment[id.attribute as String] = Pair(start, end)
         val bodyResult = generateCFG(body, graph)
 
