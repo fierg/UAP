@@ -12,7 +12,8 @@ class CFGNode(
     var ruGenSet: MutableSet<Pair<CFGNode,String>> = mutableSetOf(),
     var ruKillSet: MutableSet<Pair<CFGNode,String>> = mutableSetOf(),
     var ruInSet: MutableSet<Pair<CFGNode,String>> = mutableSetOf(),
-    var ruOutSet: MutableSet<Pair<CFGNode,String>> = mutableSetOf()
+    var ruOutSet: MutableSet<Pair<CFGNode,String>> = mutableSetOf(),
+    var marksSubCFG: Boolean = false
 ) {
     override fun toString(): String {
         return label.ifBlank { node.attribute as String? ?: node.type }
