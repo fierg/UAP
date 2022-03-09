@@ -59,11 +59,16 @@ class DOTWriter {
 
             exporter.setEdgeAttributeProvider { e ->
                 val map: MutableMap<String, Attribute> = LinkedHashMap()
-                if (e.label == "undirected") {
-                    map["arrowhead"] = DefaultAttribute.createAttribute("none")
-                    map["label"] = DefaultAttribute.createAttribute("")
-                } else
-                    map["label"] = DefaultAttribute.createAttribute(e.label)
+                when (e.label) {
+                    "undirected" -> {
+                        map["arrowhead"] = DefaultAttribute.createAttribute("none")
+                        map["label"] = DefaultAttribute.createAttribute("")
+                    }
+                    "dataflow" -> {
+                        map["color"] = DefaultAttribute.createAttribute("green")
+                    }
+                    else -> map["label"] = DefaultAttribute.createAttribute(e.label)
+                }
                 map
             }
 

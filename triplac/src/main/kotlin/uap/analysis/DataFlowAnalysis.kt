@@ -7,6 +7,7 @@ import uap.cfg.CFG
 import uap.cfg.CFGNode
 import uap.cfg.Edge
 import uap.export.DOTWriter
+import uap.node.AssignNode
 import uap.node.IDNode
 import uap.node.ParamsNode
 
@@ -24,15 +25,13 @@ class DataFlowAnalysis {
                 DepthFirstIterator(invertedGraph,cfgGraph.cfgOut).forEach { currentNode ->
                     updatePerformed = updateLiveVarsOfNode(invertedGraph, currentNode) || updatePerformed
                 }
-                if (updatePerformed) println("changes happened, performing another iteration...")
+                if (updatePerformed) println("changes detected, performing another iteration...")
             } while (updatePerformed)
             println("done.")
             handleExport(export,cfgGraph,"CFG after finding a fix point:")
         }
 
         fun analyzeReachedUses(cfgGraph: CFG, export: Boolean){
-            println("cfg iterator:")
-
             initGenAndKillReachedUses(cfgGraph)
             val invertedGraph = EdgeReversedGraph(cfgGraph.graph)
             handleExport(export, cfgGraph, "CFG after initialization:")
@@ -44,10 +43,27 @@ class DataFlowAnalysis {
                 DepthFirstIterator(invertedGraph,cfgGraph.cfgOut).forEach { currentNode ->
                     updatePerformed = updateReachedUsesOfNode(invertedGraph, currentNode) || updatePerformed
                 }
-                if (updatePerformed) println("changes happened, performing another iteration...")
+                if (updatePerformed) println("changes detected, performing another iteration...")
             } while (updatePerformed)
             println("done.")
+
+            println("Adding data flow edges to CFG")
+            DepthFirstIterator(cfgGraph.graph,cfgGraph.cfgIn).forEach {
+                when(it.node) {
+                    is AssignNode -> handleAssignNodeEdge(it, cfgGraph)
+                }
+            }
+
             handleExport(export,cfgGraph,"CFG after finding a fix point:")
+        }
+
+        private fun handleAssignNodeEdge(node: CFGNode, cfgGraph: CFG) {
+            val variable = node.ruKillSet.first().second
+            val uses = node.ruOutSet.filter { it.second == variable }
+
+            uses.forEach {
+                cfgGraph.graph.addEdge(node, it.first,Edge("dataflow"))
+            }
         }
 
         private fun updateReachedUsesOfNode(invertedGraph: EdgeReversedGraph<CFGNode, Edge>, currentNode: CFGNode): Boolean {
@@ -60,7 +76,7 @@ class DataFlowAnalysis {
             newInSet.removeAll(currentNode.ruKillSet)
             newInSet.addAll(currentNode.ruGenSet)
 
-            if (currentNode.ruInSet != newInSet && oldOut != currentNode.ruOutSet){
+            if (currentNode.ruInSet != newInSet || oldOut != currentNode.ruOutSet){
                 println("Updated ${currentNode.node.type}:${currentNode.label}     in: (${currentNode.ruInSet}) -> ($newInSet)        out: (${oldOut}) -> (${currentNode.ruOutSet})")
                 updated = true
             }
@@ -79,7 +95,7 @@ class DataFlowAnalysis {
             newInSet.removeAll(currentNode.kill)
             newInSet.addAll(currentNode.gen)
 
-            if (currentNode.inSet != newInSet && oldOut != currentNode.outSet){
+            if (currentNode.inSet != newInSet || oldOut != currentNode.outSet){
                 println("Updated ${currentNode.node.type}:${currentNode.label}     in: (${currentNode.inSet}) -> ($newInSet)        out: (${oldOut}) -> (${currentNode.outSet})")
                 updated = true
             }
