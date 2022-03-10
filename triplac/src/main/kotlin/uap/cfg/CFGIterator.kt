@@ -84,4 +84,8 @@ class CFGIterator(cfg: CFG) {
     fun forEach(action: (Pair<String, CFGNode>) -> Unit) {
         this.list.forEach { action(it) }
     }
+
+    fun list(): List<Pair<String, CFGNode>> {
+        return list.toList()
+    }
 }

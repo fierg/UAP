@@ -5,6 +5,7 @@ import org.jgrapht.graph.EdgeReversedGraph
 import org.jgrapht.traverse.BreadthFirstIterator
 import org.jgrapht.traverse.DepthFirstIterator
 import uap.cfg.CFG
+import uap.cfg.CFGIterator
 import uap.cfg.CFGNode
 import uap.cfg.Edge
 import uap.export.DOTWriter
@@ -34,7 +35,9 @@ class DataFlowAnalysis {
         }
 
         fun analyzeReachedUses(cfgGraph: CFG, export: Boolean){
-            initGenAndKillReachedUses(cfgGraph)
+            val map = CFGIterator(cfgGraph).list().associate { it.second to it.first }.toMutableMap()
+            cfgGraph.graph.vertexSet().forEach { map.computeIfAbsent(it) {"_"} }
+            initGenAndKillReachedUses(cfgGraph,map)
             val invertedGraph = EdgeReversedGraph(cfgGraph.graph)
             handleExport(export, cfgGraph, "CFG after initialization:")
 
@@ -43,7 +46,7 @@ class DataFlowAnalysis {
             do {
                 updatePerformed = false
                 BreadthFirstIterator(invertedGraph,cfgGraph.cfgOut).forEach { currentNode ->
-                    updatePerformed = updateReachedUsesOfNode(invertedGraph, currentNode) || updatePerformed
+                    updatePerformed = updateReachedUsesOfNode(invertedGraph, currentNode,map) || updatePerformed
                 }
                 if (updatePerformed) println("changes detected, performing another iteration...")
             } while (updatePerformed)
@@ -80,19 +83,25 @@ class DataFlowAnalysis {
             }
         }
 
-        private fun updateReachedUsesOfNode(invertedGraph: EdgeReversedGraph<CFGNode, Edge>, currentNode: CFGNode): Boolean {
+        private fun updateReachedUsesOfNode(
+            invertedGraph: EdgeReversedGraph<CFGNode, Edge>,
+            currentNode: CFGNode,
+            map: Map<CFGNode, String>
+        ): Boolean {
             var updated = false
             val oldOut = currentNode.ruOutSet.toSet()
             Graphs.predecessorListOf(invertedGraph, currentNode).forEach {
                 currentNode.ruOutSet.addAll(it.ruInSet)
             }
             val newInSet = currentNode.ruOutSet.toMutableSet()
+            //TODO validate proper removal
             newInSet.removeIf { node -> currentNode.ruKillSet.map { it.second }.contains(node.second) }
-            //newInSet.removeAll(currentNode.ruKillSet)
             newInSet.addAll(currentNode.ruGenSet)
 
             if (currentNode.ruInSet != newInSet || oldOut != currentNode.ruOutSet){
-                println("Updated ${currentNode.node.type}:${currentNode.label}     in: (${currentNode.ruInSet}) -> ($newInSet)        out: (${oldOut}) -> (${currentNode.ruOutSet})")
+                if (map[currentNode] != "_") {
+                    println("Updated ${map[currentNode]}     in: (${currentNode.ruInSet.map { it.third to it.second }}) -> (${newInSet.map { it.third to it.second }})        out: (${oldOut.map { it.third to it.second }}) -> (${currentNode.ruOutSet.map { it.third to it.second }})")
+                }
                 updated = true
             }
             currentNode.ruInSet = newInSet
@@ -131,12 +140,12 @@ class DataFlowAnalysis {
             }
         }
 
-        private fun initGenAndKillReachedUses(cfgGraph: CFG) {
+        private fun initGenAndKillReachedUses(cfgGraph: CFG, map: Map<CFGNode, String>) {
             DepthFirstIterator(cfgGraph.graph, cfgGraph.cfgIn).forEach { currentNode ->
                 when(currentNode.node.type) {
-                    "ID" -> currentNode.ruGenSet.add(Pair(currentNode, currentNode.label))
-                    "ASSIGN" -> currentNode.ruKillSet.add(Pair(currentNode, currentNode.node.children.filterIsInstance<IDNode>().first().attribute as String))
-                    "FUNC" -> currentNode.ruKillSet.addAll(currentNode.node.children.filterIsInstance<ParamsNode>().first().children.filterIsInstance<IDNode>().map {Pair(currentNode, it.attribute as String )})
+                    "ID" -> currentNode.ruGenSet.add(Triple(currentNode, currentNode.label, map[currentNode]!!))
+                    "ASSIGN" -> currentNode.ruKillSet.add(Triple(currentNode, currentNode.node.children.filterIsInstance<IDNode>().first().attribute as String, map[currentNode]!!))
+                    "FUNC" -> currentNode.ruKillSet.addAll(currentNode.node.children.filterIsInstance<ParamsNode>().first().children.filterIsInstance<IDNode>().map {Triple(currentNode, it.attribute as String, map[currentNode]!!)})
                 }
                 if (currentNode.ruGenSet.isNotEmpty())
                     currentNode.ruInSet = currentNode.ruGenSet.toMutableSet()

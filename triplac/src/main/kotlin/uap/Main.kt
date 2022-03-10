@@ -34,11 +34,6 @@ internal object Main {
         val cfg = ControlFlowGraphGenerator(ast)
         val cfgGraph = cfg.generate()
 
-        println("testing cfg iterator:")
-        CFGIterator(cfgGraph).forEach {
-            println(it)
-        }
-
         if (export) {
             println("Pure CFG")
             VisualDemo.printGraphToImage(cfgGraph)
