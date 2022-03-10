@@ -49,8 +49,8 @@ class ControlFlowGraphGenerator(private val ast: Node) {
     }
 
     private fun handleDefNode(node: DefNode, graph: SimpleDirectedGraph<CFGNode, Edge>): CFG {
+        if (node.children.size > 1) throw IllegalArgumentException("def node has unexpected amount of children! ${node.children}")
         return generateCFG(node.children.first, graph)
-        //TODO: fix me
     }
 
     private fun handleFuncNode(node: FuncNode, graph: SimpleDirectedGraph<CFGNode, Edge>): CFG {
@@ -114,13 +114,12 @@ class ControlFlowGraphGenerator(private val ast: Node) {
 
     private fun handleLetNode(node: LetNode, graph: SimpleDirectedGraph<CFGNode, Edge>): CFG {
         val bodyNode = node.children.filterIsInstance<BodyNode>().first()
-        val defResults = mutableListOf<CFG>()
+        val funcNodeCFGs = mutableListOf<CFG>()
 
-        node.children.filterIsInstance<DefNode>().forEach { defNode ->
-            val defResult = generateCFG(defNode, graph)
-            defResults.add(defResult)
-            functionEnvironment[defNode.children.first.children.first.attribute as String] =
-                Pair(defResult.cfgIn!!, defResult.cfgOut!!)
+        node.children.filterIsInstance<DefNode>().first().children.forEach { funcNode ->
+            val funcNodeCFG = generateCFG(funcNode, graph)
+            funcNodeCFGs.add(funcNodeCFG)
+            functionEnvironment[funcNode.children.first.attribute as String] = Pair(funcNodeCFG.cfgIn!!, funcNodeCFG.cfgOut!!)
         }
 
         val bodyResult = generateCFG(bodyNode, graph)
@@ -176,7 +175,6 @@ class ControlFlowGraphGenerator(private val ast: Node) {
     }
 
     private fun handleAssignNode(node: AssignNode, graph: SimpleDirectedGraph<CFGNode, Edge>): CFG {
-        //TODO handle expression of all children not only child 1 ?
         val result1 = generateCFG(node.children[1], graph)
         Graphs.addGraph(graph, result1.graph)
         val label = node.children.filterIsInstance<IDNode>().first().attribute
