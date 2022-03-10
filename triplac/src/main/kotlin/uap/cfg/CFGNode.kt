@@ -9,10 +9,10 @@ class CFGNode(
     var kill: MutableSet<String> = mutableSetOf(),
     var inSet: MutableSet<String> = mutableSetOf(),
     var outSet: MutableSet<String> = mutableSetOf(),
-    var ruGenSet: MutableSet<Pair<CFGNode,String>> = mutableSetOf(),
-    var ruKillSet: MutableSet<Pair<CFGNode,String>> = mutableSetOf(),
-    var ruInSet: MutableSet<Pair<CFGNode,String>> = mutableSetOf(),
-    var ruOutSet: MutableSet<Pair<CFGNode,String>> = mutableSetOf(),
+    var ruGenSet: MutableSet<Triple<CFGNode,String,String>> = mutableSetOf(),
+    var ruKillSet: MutableSet<Triple<CFGNode,String,String>> = mutableSetOf(),
+    var ruInSet: MutableSet<Triple<CFGNode,String,String>> = mutableSetOf(),
+    var ruOutSet: MutableSet<Triple<CFGNode,String,String>> = mutableSetOf(),
     var marksSubCFG: Boolean = false
 ) {
     override fun toString(): String {
