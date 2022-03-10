@@ -11,6 +11,7 @@ import java.io.FileReader
 import java.io.FileWriter
 import java.io.PrintWriter
 import uap.analysis.DataFlowAnalysis
+import uap.cfg.CFGIterator
 
 internal object Main {
     @JvmStatic
@@ -32,6 +33,11 @@ internal object Main {
 
         val cfg = ControlFlowGraphGenerator(ast)
         val cfgGraph = cfg.generate()
+
+        println("testing cfg iterator:")
+        CFGIterator(cfgGraph).forEach {
+            println(it)
+        }
 
         if (export) {
             println("Pure CFG")
