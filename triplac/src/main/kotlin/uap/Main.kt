@@ -11,7 +11,6 @@ import java.io.FileReader
 import java.io.FileWriter
 import java.io.PrintWriter
 import uap.analysis.DataFlowAnalysis
-import uap.cfg.CFGIterator
 
 internal object Main {
     @JvmStatic
