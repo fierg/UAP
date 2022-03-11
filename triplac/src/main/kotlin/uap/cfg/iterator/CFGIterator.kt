@@ -1,6 +1,9 @@
-package uap.cfg
+package uap.cfg.iterator
 
+import kotlinx.cli.ArgType
 import org.jgrapht.Graphs
+import uap.cfg.CFG
+import uap.cfg.CFGNode
 import uap.node.*
 import java.util.*
 
@@ -10,25 +13,33 @@ class CFGIterator(cfg: CFG) {
     init {
         var currentNode = Graphs.successorListOf(cfg.graph, cfg.cfgIn!!).first()
         val nameSpace = ArrayDeque<Pair<String, Int>>()
-        nameSpace.push(Pair("_", 1))
         val secondPath = ArrayDeque<CFGNode>()
+        val searchWhileLoop = ArrayDeque<Boolean>()
+
         var skippedCallNode = false
+        nameSpace.push(Pair("_", 1))
 
         while (currentNode != cfg.cfgOut) {
+            //Thread.sleep(100)
             if (currentNode.node is ConstNode || currentNode.node is OpNode) {
                 currentNode = Graphs.successorListOf(cfg.graph, currentNode).first()
-            } else if (currentNode.label == "glue") {
+            }  else if (currentNode.label == "glue") {
                 currentNode = if (secondPath.isNotEmpty()) {
                     secondPath.pop()
                 } else {
                     Graphs.successorListOf(cfg.graph, currentNode).first()
                 }
             } else {
-                val pos = nameSpace.pop()
-                list.add(Pair("${pos.first}${pos.second}", currentNode))
-                nameSpace.push(Pair(pos.first, pos.second + 1))
+                if (searchWhileLoop.isNotEmpty() && list.map { it.second }.contains(currentNode)) {
+                    currentNode = secondPath.pop()
+                    searchWhileLoop.pop()
+                }
 
+                val pos = nameSpace.pop()
                 val successors = Graphs.successorListOf(cfg.graph, currentNode)
+                list.add(Pair("${pos.first}${pos.second}", currentNode))
+                //println(list.last())
+                nameSpace.push(Pair(pos.first, pos.second + 1))
 
                 when (currentNode.node) {
                     is CallNode -> {
@@ -54,6 +65,11 @@ class CFGIterator(cfg: CFG) {
                             secondPath.push(successors.first())
                             currentNode = successors.last()
                         }
+                    }
+                    is WhileNode -> {
+                        currentNode = successors.first{it.label != "glue"}
+                        searchWhileLoop.push(true)
+                        secondPath.push(Graphs.successorListOf(cfg.graph , successors.first{it.label == "glue"}).first())
                     }
                     is FuncNode -> {
                         currentNode = if (currentNode.label.startsWith("START"))

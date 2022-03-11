@@ -5,7 +5,7 @@ import org.jgrapht.graph.EdgeReversedGraph
 import org.jgrapht.traverse.BreadthFirstIterator
 import org.jgrapht.traverse.DepthFirstIterator
 import uap.cfg.CFG
-import uap.cfg.CFGIterator
+import uap.cfg.iterator.CFGIterator
 import uap.cfg.CFGNode
 import uap.cfg.Edge
 import uap.export.DOTWriter
@@ -94,13 +94,13 @@ class DataFlowAnalysis {
                 currentNode.ruOutSet.addAll(it.ruInSet)
             }
             val newInSet = currentNode.ruOutSet.toMutableSet()
-            //TODO validate proper removal
+            //TODO validate proper removal of subsets
             newInSet.removeIf { node -> currentNode.ruKillSet.map { it.second }.contains(node.second) }
             newInSet.addAll(currentNode.ruGenSet)
 
             if (currentNode.ruInSet != newInSet || oldOut != currentNode.ruOutSet){
                 if (map[currentNode] != "_") {
-                    println("Updated ${map[currentNode]}     in: (${currentNode.ruInSet.map { it.third to it.second }}) -> (${newInSet.map { it.third to it.second }})        out: (${oldOut.map { it.third to it.second }}) -> (${currentNode.ruOutSet.map { it.third to it.second }})")
+                    println("Updated ${map[currentNode]}        out: (${oldOut.map { it.third to it.second }}) -> (${currentNode.ruOutSet.map { it.third to it.second }})        in: (${currentNode.ruInSet.map { it.third to it.second }}) -> (${newInSet.map { it.third to it.second }})")
                 }
                 updated = true
             }
