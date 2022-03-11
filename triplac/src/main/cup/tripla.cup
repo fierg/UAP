@@ -264,6 +264,20 @@ E ::= E:e1 SEMI E:e2
 
           RESULT = whileNode;
       :}
+      | WHILE C:c1 DO LBRA E:e1 RBRA
+            {:
+                WhileNode whileNode = new WhileNode();
+                CondNode condNode = new CondNode();
+                ExprNode exprNode = new ExprNode();
+
+                condNode.addChild(c1);
+                exprNode.addChild(e1);
+
+                whileNode.addChild(condNode);
+                whileNode.addChild(exprNode);
+
+                RESULT = whileNode;
+            :}
     ;
 C ::= LPAR C:c1 RPAR
       {:
