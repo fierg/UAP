@@ -9,10 +9,7 @@ import uap.cfg.iterator.CFGIterator
 import uap.cfg.CFGNode
 import uap.cfg.Edge
 import uap.export.DOTWriter
-import uap.node.AssignNode
-import uap.node.FuncNode
-import uap.node.IDNode
-import uap.node.ParamsNode
+import uap.node.*
 
 class DataFlowAnalysis {
     companion object {
@@ -81,6 +78,11 @@ class DataFlowAnalysis {
             uses.forEach {
                 cfgGraph.graph.addEdge(node, it.first,Edge("dataflow"))
             }
+
+            if (uses.isEmpty()) {
+                println("No usage of assignment found for node ${node.node.type} ${node.label}! Can be removed during optimization.")
+                node.removeable = true
+            }
         }
 
         private fun updateReachedUsesOfNode(
@@ -94,7 +96,6 @@ class DataFlowAnalysis {
                 currentNode.ruOutSet.addAll(it.ruInSet)
             }
             val newInSet = currentNode.ruOutSet.toMutableSet()
-            //TODO validate proper removal of subsets
             newInSet.removeIf { node -> currentNode.ruKillSet.map { it.second }.contains(node.second) }
             newInSet.addAll(currentNode.ruGenSet)
 
@@ -156,6 +157,29 @@ class DataFlowAnalysis {
             if (export) {
                 println(message)
                 DOTWriter.exportGraph(cfgGraph)
+            }
+        }
+
+        private fun findNodesInAST(cfgGraph: CFG, ast: Node, predecessor: Node? = null): MutableList<Triple<Node, Node, Node>> {
+            val target = mutableListOf<Triple<Node,Node,Node>>()
+            if (cfgGraph.graph.vertexSet().find { it.node == ast }?.removeable == true){
+                target.add(Triple(ast, predecessor!!, ast.children.last))
+                ast.children.forEach { target.addAll(findNodesInAST(cfgGraph,it,ast))}
+            } else {
+                ast.children.forEach { target.addAll(findNodesInAST(cfgGraph,it,ast))}
+            }
+            return target
+        }
+
+
+        fun optimize(cfgGraph: CFG, ast: Node){
+            val nodes = findNodesInAST(cfgGraph,ast)
+            nodes.forEach {
+                val pre = it.second
+                val post = it.third
+                val unwanted = pre.children.first { node -> node == it.first }
+                pre.children.remove(unwanted)
+                pre.children.add(post)
             }
         }
     }

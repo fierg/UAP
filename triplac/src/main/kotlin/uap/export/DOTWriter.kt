@@ -69,6 +69,7 @@ class DOTWriter {
                         map["label"] = DefaultAttribute.createAttribute("")
                     }
                     "dataflow" -> {
+                        map["arrowhead"] = DefaultAttribute.createAttribute("vee")
                         map["color"] = DefaultAttribute.createAttribute("green")
                     }
                     else -> map["label"] = DefaultAttribute.createAttribute(e.label)

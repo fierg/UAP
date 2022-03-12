@@ -1,6 +1,5 @@
 package uap.cfg.iterator
 
-import kotlinx.cli.ArgType
 import org.jgrapht.Graphs
 import uap.cfg.CFG
 import uap.cfg.CFGNode
@@ -20,7 +19,6 @@ class CFGIterator(cfg: CFG) {
         nameSpace.push(Pair("_", 1))
 
         while (currentNode != cfg.cfgOut) {
-            //Thread.sleep(100)
             if (currentNode.node is ConstNode || currentNode.node is OpNode) {
                 currentNode = Graphs.successorListOf(cfg.graph, currentNode).first()
             }  else if (currentNode.label == "glue") {
@@ -38,7 +36,6 @@ class CFGIterator(cfg: CFG) {
                 val pos = nameSpace.pop()
                 val successors = Graphs.successorListOf(cfg.graph, currentNode)
                 list.add(Pair("${pos.first}${pos.second}", currentNode))
-                //println(list.last())
                 nameSpace.push(Pair(pos.first, pos.second + 1))
 
                 when (currentNode.node) {
