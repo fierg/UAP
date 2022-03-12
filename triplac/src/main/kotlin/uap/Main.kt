@@ -11,6 +11,7 @@ import java.io.FileReader
 import java.io.FileWriter
 import java.io.PrintWriter
 import uap.analysis.DataFlowAnalysis
+import uap.export.ASTWriter
 import uap.generator.TramCodeGenerator
 
 internal object Main {
@@ -23,7 +24,7 @@ internal object Main {
 
         val triplaParser = Parser(de.unitrier.st.uap.Lexer(FileReader(fileName)))
         ast = triplaParser.parse().value as Node
-        printAST(fileName, ast)
+        ASTWriter.printAST(fileName, ast)
 
         //AST Strukturverbesserung
         val f = Flattener()
@@ -35,15 +36,15 @@ internal object Main {
             println("Pure CFG")
             DOTWriter.exportGraph(cfgGraph)
         }
-        DataFlowAnalysis.analyzeLiveVariables(cfgGraph, export)
+        //DataFlowAnalysis.analyzeLiveVariables(cfgGraph, export)
         DataFlowAnalysis.analyzeReachedUses(cfgGraph,export)
 
         if(opt) {
             DataFlowAnalysis.optimize(cfgGraph, ast)
             val cfg1 = ControlFlowGraphGenerator(ast)
             val cfgGraph1 = cfg1.generate()
-            //DataFlowAnalysis.analyzeLiveVariables(cfgGraph, export)
-            //DataFlowAnalysis.analyzeReachedUses(cfgGraph, export)
+            //DataFlowAnalysis.analyzeLiveVariables(cfgGraph1, export)
+            DataFlowAnalysis.analyzeReachedUses(cfgGraph1, export)
             if (export) {
                 println("Optimized CFG")
                 DOTWriter.exportGraph(cfgGraph1)
@@ -55,23 +56,6 @@ internal object Main {
 
         for (instruction in instructions) {
             println(instruction.toString())
-        }
-    }
-
-    private fun printAST(fileName: String, ast: Node) {
-        var fileName1 = fileName
-        var pw: PrintWriter? = null
-        try {
-            fileName1 = fileName1.substring(fileName1.lastIndexOf("/") + 1, fileName1.lastIndexOf("."))
-            fileName1 = String.format("%s-ast.xml", fileName1)
-            pw = PrintWriter(BufferedWriter(FileWriter(fileName1)))
-            pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>")
-            pw.print(ast.toString())
-            System.out.printf("\"%s\" file created\n", fileName1)
-        } catch (e: Exception) {
-            System.err.println(e.message)
-        } finally {
-            pw?.close()
         }
     }
 }
