@@ -15,7 +15,6 @@ class TramCodeGenerator(private val ast: Node) {
     fun generate(): MutableList<Pair<Instruction, AddressPair?>> {
         val rho = ast.elab_def(mutableMapOf<String, AddressPair>(), 0)
         println("Rho: { $rho }")
-
         codeNode(ast, rho)
         instructions.add(Pair(Instruction(Instruction.HALT), null))
 
@@ -98,7 +97,6 @@ class TramCodeGenerator(private val ast: Node) {
     }
 
     private fun handleFuncNode(node: FuncNode, rho: Map<String, AddressPair>) {
-        println("Coding func node...")
         val ap = getFuncNameFromRho(node, rho)
         val label = addressFactory.getNewLabelAddressPair(
             -1,

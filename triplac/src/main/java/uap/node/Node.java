@@ -89,9 +89,7 @@ public abstract class Node implements ITramcodeGeneratable {
         AtomicReference<Map<String, AddressPair>> rhoC = new AtomicReference<>(new HashMap<>(rho));
 
         if (!children.isEmpty())
-            //System.out.println("Handling default node: " + this.type + " on level " + nl);
             children.forEach(child -> rhoC.set(child.elab_def(rhoC.get(), nl)));
-        //System.out.println(rho.toString());
         return rhoC.get();
     }
 
