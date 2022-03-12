@@ -58,8 +58,8 @@ class ControlFlowGraphGenerator(private val ast: Node) {
         val id = node.children.filterIsInstance<IDNode>().first()
         val params = node.children.filterIsInstance<ParamsNode>().first().children.map { it.attribute }.toString()
 
-        val start = CFGNode(node, "START ${id.attribute}$params", marksSubCFG = true)
-        val end = CFGNode(node, "END ${id.attribute}$params",marksSubCFG = true)
+        val start = CFGNode(node, "START ${id.attribute}$params")
+        val end = CFGNode(node, "END ${id.attribute}$params")
         functionEnvironment[id.attribute as String] = Pair(start, end)
         val bodyResult = generateCFG(body, graph)
 

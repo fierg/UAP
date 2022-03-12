@@ -35,13 +35,20 @@ internal object Main {
 
         if (export) {
             println("Pure CFG")
-            VisualDemo.printGraphToImage(cfgGraph)
             DOTWriter.exportGraph(cfgGraph)
         }
 
-        //DataFlowAnalysis.analyzeLiveVariables(cfgGraph, export)
+        DataFlowAnalysis.analyzeLiveVariables(cfgGraph, export)
         DataFlowAnalysis.analyzeReachedUses(cfgGraph,export)
+        DataFlowAnalysis.optimize(cfgGraph,ast)
 
+        val cfg1 = ControlFlowGraphGenerator(ast)
+        val cfgGraph1 = cfg1.generate()
+
+        if (export) {
+            println("Optimized CFG")
+            DOTWriter.exportGraph(cfgGraph1)
+        }
 
         /*
         val t = TramCodeGenerator(ast)
