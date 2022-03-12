@@ -14,8 +14,6 @@ public class AssignNode extends Node
 
     @Override
     public Map<String, AddressPair> elab_def(Map<String, AddressPair> rho, int nl) {
-        System.out.println("Handling assign node on level " + nl);
-
         getChildren().forEach(node -> {
             if (IDNode.class.equals(node.getClass())){
                 rho.put((String) node.getAttribute(), addressFactory.getNewIntegerAddressPair(nl));

@@ -11,25 +11,23 @@ import java.io.FileReader
 import java.io.FileWriter
 import java.io.PrintWriter
 import uap.analysis.DataFlowAnalysis
+import uap.generator.TramCodeGenerator
 
 internal object Main {
     @JvmStatic
     fun main(args: Array<String>) {
-        Thread.sleep(100)
-
         val ast: Node
-        val export = args[0].matches(Regex("-expcfg"))
-        val fileName = if (export) args[1] else args[0]
+        val export = args.any { Regex("-expcfg").matches(it) }
+        val opt = args.any { Regex("-opt").matches(it) }
+        val fileName = args.last()
 
         val triplaParser = Parser(de.unitrier.st.uap.Lexer(FileReader(fileName)))
         ast = triplaParser.parse().value as Node
-
         printAST(fileName, ast)
 
         //AST Strukturverbesserung
         val f = Flattener()
         f.flatten(ast)
-
         val cfg = ControlFlowGraphGenerator(ast)
         val cfgGraph = cfg.generate()
 
@@ -37,29 +35,27 @@ internal object Main {
             println("Pure CFG")
             DOTWriter.exportGraph(cfgGraph)
         }
-
         DataFlowAnalysis.analyzeLiveVariables(cfgGraph, export)
         DataFlowAnalysis.analyzeReachedUses(cfgGraph,export)
-        DataFlowAnalysis.optimize(cfgGraph,ast)
 
-        val cfg1 = ControlFlowGraphGenerator(ast)
-        val cfgGraph1 = cfg1.generate()
-
-        if (export) {
-            println("Optimized CFG")
-            DOTWriter.exportGraph(cfgGraph1)
+        if(opt) {
+            DataFlowAnalysis.optimize(cfgGraph, ast)
+            val cfg1 = ControlFlowGraphGenerator(ast)
+            val cfgGraph1 = cfg1.generate()
+            //DataFlowAnalysis.analyzeLiveVariables(cfgGraph, export)
+            //DataFlowAnalysis.analyzeReachedUses(cfgGraph, export)
+            if (export) {
+                println("Optimized CFG")
+                DOTWriter.exportGraph(cfgGraph1)
+            }
         }
 
-        /*
         val t = TramCodeGenerator(ast)
         val instructions = t.generate()
 
         for (instruction in instructions) {
             println(instruction.toString())
         }
-        val abstractMachine = AbstractMachine(instructions.map { it.first }.toTypedArray(),true)
-        abstractMachine.run()
-         */
     }
 
     private fun printAST(fileName: String, ast: Node) {
